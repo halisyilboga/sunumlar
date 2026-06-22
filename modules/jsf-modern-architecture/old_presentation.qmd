@@ -4,7 +4,7 @@ subtitle: "Geleceğin Arkeolojisi: Sunucudan Ayrılış ve Eve Dönüş"
 author: "@halisyilboga"
 format:
   revealjs:
-    theme: [black, cinematic.css]
+    theme: [black, ../../shared/styles/cinematic.css]
     width: 1920
     height: 1080
     slide-number: true
@@ -13,7 +13,7 @@ format:
     controls: true
 ---
 
-## Dijital Ouroboros {#intro-slide background-image="images/pendulum_returns.png" background-size="100% 85%" background-position="center" background-opacity="0.2"}
+## Dijital Ouroboros {#intro-slide background-image=../../shared/assets/images/pendulum_returns.png" background-size="100% 85%" background-position="center" background-opacity="0.2"}
 
 **Geleceğin Arkeolojisi**
 
@@ -35,7 +35,7 @@ Sunucudan Ayrılış ve Eve Dönüş
 :::
 
 ::: {.column width="70%"}
-![](images/ouroboros_generated.png){width="100%" style="margin-top: 0; margin-left: -50px;"}
+![](../../shared/assets/images/ouroboros_generated.png){width="100%" style="margin-top: 0; margin-left: -50px;"}
 :::
 
 ::::
@@ -59,7 +59,7 @@ Sunucudan Ayrılış ve Eve Dönüş
 
 ## Yol Haritamız
 
-![](images/diagram_01_timeline_evolution.png)
+![](../../shared/assets/images/diagram_01_timeline_evolution.png)
 
 ## Üç Temel İlke
 
@@ -116,7 +116,7 @@ Sunucudan Ayrılış ve Eve Dönüş
 
 ## Karmaşıklık Görselleştirmesi
 
-![](images/complexity_is_there.png)
+![](../../shared/assets/images/complexity_is_there.png)
 
 ## Backend Developer İçin
 
@@ -192,7 +192,7 @@ Sunucudan Ayrılış ve Eve Dönüş
 
 ## Mimari Sarkaç
 
-![](images/diagram_03_pendulum.png)
+![](../../shared/assets/images/diagram_03_pendulum.png)
 
 **Yazılım doğrusal ilerlemez, sarkaç gibi salınır**
 
@@ -209,11 +209,11 @@ Sunucudan Ayrılış ve Eve Dönüş
 
 ## Component Ağacı Evrimi
 
-![](images/11_component_tree_evolution.png)
+![](../../shared/assets/images/11_component_tree_evolution.png)
 
 ## JSF: Ağaç Sunucuda
 
-![](images/component_tree_uiviewroot_v2.png)
+![](../../shared/assets/images/component_tree_uiviewroot_v2.png)
 
 **UIViewRoot** sunucu hafızasında
 
@@ -231,7 +231,7 @@ Ağacı tarayıcıya (Virtual DOM) taşıdık
 
 ## Modern: Ağaç Eve Dönüyor
 
-![](images/diagram_04_rsc_class.png)
+![](../../shared/assets/images/diagram_04_rsc_class.png)
 
 **React Server Components:**  
 Gövde sunucuda, yapraklar tarayıcıda
@@ -246,7 +246,7 @@ HTTP'yi Java nesnelerine çeviren **devasa Çeviri Motoru**
 
 ## 6 Fazlı Döngü
 
-![](images/jsf_lifecycle_phases_v2.png)
+![](../../shared/assets/images/jsf_lifecycle_phases_v2.png)
 
 Her istekte **aynı 6 adım**
 
@@ -279,7 +279,7 @@ public String login() {
 
 ## Component Tree
 
-![](images/component_tree_uiviewroot_v2.png)
+![](../../shared/assets/images/component_tree_uiviewroot_v2.png)
 
 Her HTML etiketinin Java nesnesi karşılığı
 
@@ -312,11 +312,11 @@ PrimeFaces = Java ile konfigüre edilmiş **jQuery fabrikası**
 
 ## jQuery Üretimi
 
-![](images/primefaces_jquery_generation_v2.png)
+![](../../shared/assets/images/primefaces_jquery_generation_v2.png)
 
 ## Renderer Mekanizması
 
-![](images/diagram_06_renderer.png)
+![](../../shared/assets/images/diagram_06_renderer.png)
 
 **"Write Once, Render Anywhere"**
 
@@ -475,11 +475,11 @@ export async function save(formData) {
 
 ## Glue Code Buzdağı
 
-![](images/glue_code_iceberg_v2.png)
+![](../../shared/assets/images/glue_code_iceberg_v2.png)
 
 ## File Explosion
 
-![](images/file_explosion_v2.png)
+![](../../shared/assets/images/file_explosion_v2.png)
 
 ## SPA: Kazandıklarımız
 
@@ -555,18 +555,18 @@ async function deleteUser() {
 
 ## Sarkaç Dönüyor
 
-![](images/pendulum_returns.png)
+![](../../shared/assets/images/pendulum_returns.png)
 
 ## Data Proximity
 
-![](images/diagram_13_data_proximity.png)
+![](../../shared/assets/images/diagram_13_data_proximity.png)
 
 **Veriye Yakınlık İlkesi:**  
 Mantık veriye ne kadar yakın → performans o kadar yüksek
 
 ## N+1 Problemi
 
-![](images/diagram_08_n_plus_one.png)
+![](../../shared/assets/images/diagram_08_n_plus_one.png)
 
 ## Over/Under Fetching
 
@@ -630,7 +630,7 @@ Mantık veriye ne kadar yakın → performans o kadar yüksek
 
 ## Spiral Yükseliş
 
-![](images/diagram_15_spiral_ascent.png)
+![](../../shared/assets/images/diagram_15_spiral_ascent.png)
 
 **Eskiye dönmüyoruz**
 

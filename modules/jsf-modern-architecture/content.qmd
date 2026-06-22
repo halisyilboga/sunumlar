@@ -7,7 +7,7 @@ format:
     slide-number: true
     chalkboard: true
     preview-links: auto
-    logo: images/ouroboros_generated.png
+    logo: ../../shared/assets/images/ouroboros_generated.png
     transition: slide
     width: 1920
     height: 1080
@@ -17,13 +17,13 @@ format:
     highlight-style: monokai
     scrollable: true
 title-slide-attributes:
-  data-background-image: images/ouroboros_generated.png
+  data-background-image: ../../shared/assets/images/ouroboros_generated.png
   data-background-size: contain
   data-background-opacity: "0.2"
 lang: tr
 ---
 
-![Dijital Ouroboros](images/ouroboros_generated.png){style="transform: scale(1.5);"}
+![Dijital Ouroboros](../../shared/assets/images/ouroboros_generated.png){style="transform: scale(1.5);"}
 
 **Alt Başlık:** Tarih Tekerrürden İbarettir: Sunucudan Ayrılış ve Eve Dönüş
 
@@ -51,9 +51,9 @@ Bu sunum, teknolojileri birbiriyle yarıştırmaktan ziyade, **birlikte geçtiğ
 ---
 
 ::: {.r-stack style="transform: scale(1.5); margin-top: -50px;"}
-![İlk bakışta gördüğümüz sadelik (Abstraction)](images/magic_is_engineering.png){width=60%}
+![İlk bakışta gördüğümüz sadelik (Abstraction)](../../shared/assets/images/magic_is_engineering.png){width=60%}
 
-![Aslında arka planda çalışan mühendislik](images/magic_is_engineering_v2.png){.fragment .fade-in width=90%}
+![Aslında arka planda çalışan mühendislik](../../shared/assets/images/magic_is_engineering_v2.png){.fragment .fade-in width=90%}
 :::
 
 
@@ -121,7 +121,7 @@ Bir sarkaçtan çok, **yukarı doğru bir spiral** hareketi bu. Her döngüde bi
 
 ### Yol Haritamız
 
-![Web Mimarisi Evrimi Timeline](images/diagram_01_timeline_evolution.png){style="transform: scale(1.5);"}
+![Web Mimarisi Evrimi Timeline](../../shared/assets/images/diagram_01_timeline_evolution.png){style="transform: scale(1.5);"}
 
 
 
@@ -153,7 +153,7 @@ Bu yolculukta tekrar tekrar göreceğiniz üç evrensel hakikat var. Bunları ba
 
 ---
 
-![State Management Evrimi](images/diagram_02_state_management.png)
+![State Management Evrimi](../../shared/assets/images/diagram_02_state_management.png)
 
 ---
 
@@ -198,7 +198,7 @@ Fizikteki "Enerjinin Korunumu Yasası" gibi, yazılımda da "**Karmaşıklığı
 - **Modern Stack**: Karmaşıklık dağıtıldı (Sunucu + İstemci + Build Time)
 
 
-![Karmaşıklık orada bir yerde](images/complexity_conservation_v2.png){style="transform: scale(1.5);"}
+![Karmaşıklık orada bir yerde](../../shared/assets/images/complexity_conservation_v2.png){style="transform: scale(1.5);"}
 
 ---
 
@@ -206,7 +206,7 @@ Fizikteki "Enerjinin Korunumu Yasası" gibi, yazılımda da "**Karmaşıklığı
 **Sonuç:** Karmaşıklığı yok edemezsiniz, sadece en az zarar vereceği yere taşırsınız.
 
 
-![Karmaşıklık orada bir yerde](images/complexity_conservation.png){style="transform: scale(1.5);"}
+![Karmaşıklık orada bir yerde](../../shared/assets/images/complexity_conservation.png){style="transform: scale(1.5);"}
 
 ---
 
@@ -227,7 +227,7 @@ Bu durumu iki farklı mimari yaklaşım üzerinden şöyle okuyabiliriz:
 
 ---
 
-![Karmaşıklık Eğrisi](images/diagram_07_complexity_curve.png){width="85%" fig-align="center"}
+![Karmaşıklık Eğrisi](../../shared/assets/images/diagram_07_complexity_curve.png){width="85%" fig-align="center"}
 
 ---
 
@@ -362,13 +362,13 @@ Bir JSF sayfasına tıkladığınızda, sunucu tarafında bu **6 adım asla şa�
 
 
 
-![JSF Lifecycle Faz Akışı](images/jsf_lifecycle_phases.png){style="transform: scale(1.5);"}
+![JSF Lifecycle Faz Akışı](../../shared/assets/images/jsf_lifecycle_phases.png){style="transform: scale(1.5);"}
 
 ---
 
 #### Detaylı Görsel
 
-![JSF Lifecycle Faz Akışı detaylı](images/jsf_lifecycle_phases_v2.png){style="transform: scale(1.5);"}  
+![JSF Lifecycle Faz Akışı detaylı](../../shared/assets/images/jsf_lifecycle_phases_v2.png){style="transform: scale(1.5);"}  
 
 Ham madde (Request) girer 
 
@@ -450,7 +450,7 @@ public String login() {
 
 UI bileşenlerimiz (Button, Input, Panel) **nerede yaşıyor?** Bu sorunun cevabı, mimarinin kalbidir.
 
-![Component Tree Yapısı ](images/component_tree_uiviewroot_v2.png){style="transform: scale(1.5);"}
+![Component Tree Yapısı ](../../shared/assets/images/component_tree_uiviewroot_v2.png){style="transform: scale(1.5);"}
 
 ::: {.callout-tip style="font-size: 1.5em;"}
 Sol tarafta HTML DOM (Tarayıcı). Sağ tarafta aynadaki yansıması: Java Nesne Ağacı (Sunucu). Birebir eşleşmeyi gösterir.
@@ -463,7 +463,7 @@ JSF'de `UIViewRoot` sunucu hafızasındadır (Heap). Tarayıcı sadece bir "yans
 *   **Avantaj:** Güvenli, veritabanına yakın.
 *   **Dezavantaj:** Sunucu belleği şişer (Session Replication derdi).
 
-![Component Tree Yapısı](images/component_tree_uiviewroot.png){style="transform: scale(1.5);"}
+![Component Tree Yapısı](../../shared/assets/images/component_tree_uiviewroot.png){style="transform: scale(1.5);"}
 
 ---
 
@@ -504,7 +504,7 @@ Bunu bir **Restoran Menüsü** üzerinden anlayabiliriz:
 
 ---
 
-![RSC Class Diyagramı](images/diagram_04_rsc_class.png){style="transform: scale(1.5);"}
+![RSC Class Diyagramı](../../shared/assets/images/diagram_04_rsc_class.png){style="transform: scale(1.5);"}
 
 
 ---
@@ -514,7 +514,7 @@ Bunu bir **Restoran Menüsü** üzerinden anlayabiliriz:
 
 
 
-![Component Tree Evrimi](images/11_component_tree_evolution.png){style="transform: scale(1.5);"}
+![Component Tree Evrimi](../../shared/assets/images/11_component_tree_evolution.png){style="transform: scale(1.5);"}
 
 ::: {.callout-tip style="font-size: 1.5em;"}
 Zamanla ağacın gövdesini sunucuya taşıdık, sadece yapraklarını tarayıcıda bıraktık.
@@ -579,11 +579,11 @@ UICommand submitButton = new UICommand();
 
 ---
 
-![PrimeFaces jQuery Üretimi](images/primefaces_jquery_generation.png){width="100%" style="margin-top: 0; margin-left: 0px;; transform: scale(1.5);"}
+![PrimeFaces jQuery Üretimi](../../shared/assets/images/primefaces_jquery_generation.png){width="100%" style="margin-top: 0; margin-left: 0px;; transform: scale(1.5);"}
 
 ---
 
-![PrimeFaces jQuery Üretimi (v2)](images/primefaces_jquery_generation_v2.png){width="200%" style="margin-top: 0; margin-left: -50px;; transform: scale(1.5);"}
+![PrimeFaces jQuery Üretimi (v2)](../../shared/assets/images/primefaces_jquery_generation_v2.png){width="200%" style="margin-top: 0; margin-left: -50px;; transform: scale(1.5);"}
 
 ::: {.callout-tip style="font-size: 1em;"}
 En dışta: JSF Component.  
@@ -619,7 +619,7 @@ JSF'nin en az anlaşılan gücü: **"Write Once, Render Anywhere"**
 
 ---
 
-![Renderer Mekanizması](images/diagram_06_renderer.png){style="transform: scale(1.5);"}
+![Renderer Mekanizması](../../shared/assets/images/diagram_06_renderer.png){style="transform: scale(1.5);"}
 
 ---
 
@@ -682,7 +682,7 @@ Temel JSF component'leri fonksiyoneldi ama **estetikten uzaktı**:
 JSF'i **modern, zengin ve kullanılabilir** hale getirdi.
 
 
-![PrimeFaces theme](images/primefacestheme.png){width="100%" style="margin-top: 0; margin-left: 0px;; transform: scale(1.5);"}
+![PrimeFaces theme](../../shared/assets/images/primefacestheme.png){width="100%" style="margin-top: 0; margin-left: 0px;; transform: scale(1.5);"}
 
 
 ---
@@ -1028,11 +1028,11 @@ React (12 Dosya): Un, yumurta, şeker, süt... (Tam kontrol ama birleştirmek se
 
 
 
-![12 Dosya vs 3 Dosya](images/file_explosion.png){style="transform: scale(1.5);"}
+![12 Dosya vs 3 Dosya](../../shared/assets/images/file_explosion.png){style="transform: scale(1.5);"}
 
 ---
 
-![12 Dosya vs 3 Dosya detaylı](images/file_explosion_v2.png){style="transform: scale(1.5);"}  
+![12 Dosya vs 3 Dosya detaylı](../../shared/assets/images/file_explosion_v2.png){style="transform: scale(1.5);"}  
 
 
 
@@ -1100,7 +1100,7 @@ const handleSubmit = async (e) => {
 ```
 **Görsel 1: Sol tarafta JSF'in 3 satırlık `save` metodu, sağ tarafta React'in aynı işi yapan dağıtık yapısı (Slice, Component, API).**
 
-![Simple vs Complex Code](images/comparison_save_user.png){style="transform: scale(1.5);"}
+![Simple vs Complex Code](../../shared/assets/images/comparison_save_user.png){style="transform: scale(1.5);"}
 
 
 ---
@@ -1126,7 +1126,7 @@ SPA ile birlikte DevOps'un işi **Runtime**'dan **Build Time**'a kaydı.
 
 **Senaryo**: 10,000 kayıtlık kullanıcı listesi. Pagination, sorting, filtering.
 
-![Declarative vs Imperative Code](images/comparison_datatable.png){style="transform: scale(1.5);"}
+![Declarative vs Imperative Code](../../shared/assets/images/comparison_datatable.png){style="transform: scale(1.5);"}
 
 **Görsel 2: PrimeFaces'in declarative (ne istediğini söyle) yapısı vs React Table'ın imperative (nasıl yapılacağını söyle) kurulumu.**
 
@@ -1152,7 +1152,7 @@ SPA ile birlikte DevOps'un işi **Runtime**'dan **Build Time**'a kaydı.
 
 **Senaryo**: "Kaydet" butonuna basınca sadece mesaj güncellensin (sayfa yenilenmesin).
 
-![What vs How Code](images/comparison_ajax.png){style="transform: scale(1.5);"}
+![What vs How Code](../../shared/assets/images/comparison_ajax.png){style="transform: scale(1.5);"}
 
 **Görsel 3: JSF'te AJAX sadece bir etikettir (`<f:ajax>`). React'te ise state yönetimi, hata yakalama ve loading durumlarını elle kodlamanız gerekir.Declarative vs Imperative**
 
@@ -1163,8 +1163,8 @@ SPA ile birlikte DevOps'un işi **Runtime**'dan **Build Time**'a kaydı.
 
 ### Görünmeyen Kod: "Glue Code" Analizi
 
-![Buzdağı Analizi](images/glue_code_iceberg.png){style="transform: scale(1.5);"}
-![Buzdağı Analizi (v2){style="transform: scale(1.5);"}](images/glue_code_iceberg_v2.png){style="transform: scale(1.5);"}  
+![Buzdağı Analizi](../../shared/assets/images/glue_code_iceberg.png){style="transform: scale(1.5);"}
+![Buzdağı Analizi (v2){style="transform: scale(1.5);"}](../../shared/assets/images/glue_code_iceberg_v2.png){style="transform: scale(1.5);"}  
 
 ::: {.callout-tip style="font-size: 1.5em;"}
 Modern Stack: Harika görünen parçalar, ama hepsi birbirine koli bandıyla (Glue Code) tutturulmuş.  
@@ -1223,7 +1223,7 @@ SPA'nın sorunları giderek belirginleşti:
 - Component  tree sunucuda render  edilir
 - Server Actions sunucuda çalışır
 
-![Sarkaç Eve Döndü](/images/pendulum_returns.png){style="transform: scale(1.5);"}
+![Sarkaç Eve Döndü](../../shared/assets/images/pendulum_returns.png){style="transform: scale(1.5);"}
 
 
 ---
@@ -1305,7 +1305,7 @@ Gelin, 20 yıl arayla yazılmış iki kod parçasına bakalım. Benzerlik şok e
 
 ### Senaryo: Bir Kullanıcıyı Kaydetmek
 
-![History Repeats Code](images/comparison_server_action.png){style="transform: scale(1.5);"}
+![History Repeats Code](../../shared/assets/images/comparison_server_action.png){style="transform: scale(1.5);"}
 
 **Görsel 4: Tarih tekerrür ediyor. 2006'daki Managed Bean metodu ile 2024'teki Server Action arasındaki şaşırtıcı benzerlik.**
 
@@ -1361,14 +1361,14 @@ Mimari seçimler sadece "hangi framework" sorusu değildir. **Verinin nereden ge
 
 
 
-![N+1 Query Problemi](/images/n_plus_one_problem.png){style="transform: scale(1.5);"}
+![N+1 Query Problemi](../../shared/assets/images/n_plus_one_problem.png){style="transform: scale(1.5);"}
 
-![N+1 Query Problemi](images/08_n_plus_one.png){style="transform: scale(1.5);"}
+![N+1 Query Problemi](../../shared/assets/images/08_n_plus_one.png){style="transform: scale(1.5);"}
 
 
 **Senaryo**: 100 kullanıcı listesi, her birinin departmanı gösterilecek.
 
-![N+1 Problem Karşılaştırması](images/diagram_08_n_plus_one.png){style="transform: scale(1.5);"}
+![N+1 Problem Karşılaştırması](../../shared/assets/images/diagram_08_n_plus_one.png){style="transform: scale(1.5);"}
 
 **JSF (Sunucu tarafı)**:
 ```java
@@ -1418,7 +1418,7 @@ const users = await fetch('/api/users'); // 1 istek
 | **Çok Veri** | ✅ Server Components (Admin, Dashboard) | ⚠️ SPA + GraphQL (E-ticaret) |
 | **Az Veri** | 🟢 Statik Site (Blog) | 🔵 SPA + REST (Chat, Real-time) |
 
-![Veri Yoğunluğu vs Etkileşim](images/diagram_09_data_intensity.png){style="transform: scale(1.5);"}
+![Veri Yoğunluğu vs Etkileşim](../../shared/assets/images/diagram_09_data_intensity.png){style="transform: scale(1.5);"}
 
 **Yorumlama:**
 - **Sol üst (Çok veri, az etkileşim)**: JSF/PrimeFaces veya Server Components ideal
@@ -1445,10 +1445,10 @@ const users = await fetch('/api/users'); // 1 istek
 
 ### Waterfall: Client'ta mı, Server'da mı?
 
-![Waterfall Karşılaştırması](images/waterfall_comparison.png){style="transform: scale(1.5);"}
+![Waterfall Karşılaştırması](../../shared/assets/images/waterfall_comparison.png){style="transform: scale(1.5);"}
 
 
-![Waterfall Karşılaştırması](/images/diagram_12_waterfall_comparison){style="transform: scale(1.5);"}
+![Waterfall Karşılaştırması](../../shared/assets/images/diagram_12_waterfall_comparison){style="transform: scale(1.5);"}
 
 
 **Client-side Data Fetching (SPA)**:
@@ -1472,7 +1472,7 @@ Sayfa yükle → JS parse → Veri iste → Bekle → Render → Alt veri iste �
 
 ### Kritik İçgörü: Data Proximity
 
-![Data Proximity Diagramı](images/13_data_proximity.png){style="transform: scale(1.5);"}
+![Data Proximity Diagramı](../../shared/assets/images/13_data_proximity.png){style="transform: scale(1.5);"}
 
 
 **"Veri sunucuya ne kadar yakınsa, mimari o kadar basit."**
@@ -1493,9 +1493,9 @@ Sayfa yükle → JS parse → Veri iste → Bekle → Render → Alt veri iste �
 ---
 
 ## 8️⃣ JSF'ten Öğrenmemiz Gerekenler: Kayıp Best Practice'ler
-![Best Practices Karşılaştırması](images/diagram_14_best_practices.png){style="transform: scale(1.5);"}
+![Best Practices Karşılaştırması](../../shared/assets/images/diagram_14_best_practices.png){style="transform: scale(1.5);"}
 
-![Best Practices Karşılaştırması](/images/best_practices_comparison.png){style="transform: scale(1.5);"}
+![Best Practices Karşılaştırması](../../shared/assets/images/best_practices_comparison.png){style="transform: scale(1.5);"}
 <!-- ⚠️ EKSİK GÖRSEL: Bu dosya henüz oluşturulmamış -->
 
 <!-- 📸 GÖRSEL PROMPT: best_practices_comparison.png
@@ -1901,7 +1901,7 @@ Mevcut SPA/SSR projenizde şu soruları sorun:
 
 ### Karar Ağacı (Decision Tree)
 
-![Karar Ağacı](images/diagram_10_decision_tree.png){style="transform: scale(1.5);"}
+![Karar Ağacı](../../shared/assets/images/diagram_10_decision_tree.png){style="transform: scale(1.5);"}
 
 
 ---
@@ -1948,7 +1948,7 @@ Mevcut SPA/SSR projenizde şu soruları sorun:
 
 Yazılım dünyası doğrusal bir çizgide ilerlemez; bir sarkaç gibi salınır. Biz şu an, sarkacın tekrar "Sunucu" (Server) tarafına döndüğü tarihi bir ana tanıklık ediyoruz.
 
-![Mimari Sarkaç](images/diagram_03_pendulum.png){style="transform: scale(1.5);"}
+![Mimari Sarkaç](../../shared/assets/images/diagram_03_pendulum.png){style="transform: scale(1.5);"}
 
 
 ---
@@ -2009,7 +2009,7 @@ Yazılım dünyası doğrusal bir çizgide ilerlemez; bir sarkaç gibi salınır
 
 Yazılım dünyası doğrusal bir çizgide ilerlemez; bir sarkaç gibi salınır. Biz şu an, sarkacın tekrar "Sunucu" (Server) tarafına döndüğü tarihi bir ana tanıklık ediyoruz.
 
-![Mimari Sarkaç](images/diagram_03_pendulum.png){style="transform: scale(1.5);"}
+![Mimari Sarkaç](../../shared/assets/images/diagram_03_pendulum.png){style="transform: scale(1.5);"}
 
 
 ---
@@ -2101,9 +2101,9 @@ Yazılım dünyası doğrusal bir çizgide ilerlemez; bir sarkaç gibi salınır
 
 ## 🏁 Kapanış
 
-![Spiral Yükseliş](images/diagram_15_spiral_ascent.png){style="transform: scale(1.5);"}
+![Spiral Yükseliş](../../shared/assets/images/diagram_15_spiral_ascent.png){style="transform: scale(1.5);"}
 
-![Spiral Yükseliş](/images/spiral_ascent_final.png){style="transform: scale(1.5);"}
+![Spiral Yükseliş](../../shared/assets/images/spiral_ascent_final.png){style="transform: scale(1.5);"}
 <!-- ⚠️ EKSİK GÖRSEL: Bu dosya henüz oluşturulmamış -->
 
 <!-- 📸 GÖRSEL PROMPT: spiral_ascent_final.png

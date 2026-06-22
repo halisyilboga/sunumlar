@@ -1,6 +1,6 @@
 # Dijital Ouroboros: Geleceğin Arkeolojisi
 
-![Dijital Ouroboros](images/ouroboros_generated.png)
+![Dijital Ouroboros](../../shared/assets/images/ouroboros_generated.png)
 
 **Alt Başlık:** Tarih Tekerrürden İbarettir: Sunucudan Ayrılış ve Eve Dönüş
 
@@ -19,9 +19,9 @@ Bu sunum, teknolojileri birbiriyle yarıştırmaktan ziyade, **birlikte geçtiğ
 1.  **Değişimi Okumak:** Teknolojilerin neden değiştiğini ve o günün şartlarında hangi ihtiyaca cevap verdiğini hatırlamak.
 2.  **Sihrin Arkasına Bakmak:** Bugün "standart" kabul ettiğimiz kolaylıkların arkasında yatan mühendislik mirasını fark etmek.
 
-![Sihir gibi görünen şey aslında mühendislik](images/magic_is_engineering.png)
+![Sihir gibi görünen şey aslında mühendislik](../../shared/assets/images/magic_is_engineering.png)
 
-![Sihir gibi görünen şey aslında mühendislik detaylı](images/magic_is_engineering_v2.png)  
+![Sihir gibi görünen şey aslında mühendislik detaylı](../../shared/assets/images/magic_is_engineering_v2.png)  
 
 > [!TIP]
 > İlk bakışta gördüğümüz sadelik (Abstraction) vs Aslında arka planda çalışan mühendislik
@@ -68,7 +68,7 @@ Bir sarkaçtan çok, **yukarı doğru bir spiral** hareketi bu. Her döngüde bi
 
 ### Yol Haritamız
 
-![Web Mimarisi Evrimi Timeline](images/diagram_01_timeline_evolution.png)
+![Web Mimarisi Evrimi Timeline](../../shared/assets/images/diagram_01_timeline_evolution.png)
 
 ---
 
@@ -82,7 +82,7 @@ Bu yolculukta tekrar tekrar göreceğiniz üç evrensel hakikat var. Bunları ba
 
 **Durum yönetimi** web'in temel problemidir. HTTP protokolü "stateless" (durumsuz) olduğu için, kullanıcının durumunu bir yerde tutmalıyız:
 
-![State Management Evrimi](images/diagram_02_state_management.png)
+![State Management Evrimi](../../shared/assets/images/diagram_02_state_management.png)
 
 - **JSF (2006)**: Sunucu RAM'inde (Session + ViewState)
 - **React SPA (2015)**: Tarayıcı hafızasında (Redux, Context)
@@ -122,8 +122,8 @@ Sunucunun kullanıcıyı "hatırlaması" için kullanılan yöntemler de evrim g
 
 Fizikteki "Enerjinin Korunumu Yasası" gibi, yazılımda da "**Karmaşıklığın Korunumu**" vardır.
 
-![Karmaşıklık orada bir yerde](images/complexity_conservation.png)
-![Karmaşıklık orada bir yerde detaylı](images/complexity_conservation_v2.png)  
+![Karmaşıklık orada bir yerde](../../shared/assets/images/complexity_conservation.png)
+![Karmaşıklık orada bir yerde detaylı](../../shared/assets/images/complexity_conservation_v2.png)  
 
 
 
@@ -137,7 +137,7 @@ Fizikteki "Enerjinin Korunumu Yasası" gibi, yazılımda da "**Karmaşıklığı
 
 Neden SPA'dan SSR'a dönülüyor? Çünkü "Arızi Karmaşıklık" (Accidental Complexity) yönetilemez hale geldi.
 
-![Karmaşıklık Eğrisi](images/diagram_07_complexity_curve.png)
+![Karmaşıklık Eğrisi](../../shared/assets/images/diagram_07_complexity_curve.png)
 
 *   **SPA + REST:** Basit bir "Merhaba Dünya" için bile DTO, Controller, Service, Axios, Redux, Store, Component gerekir. (10+ Dosya)
 *   **Modern Monolit (SSR):** Veritabanı ve UI yan yana. (2-3 Dosya). Tip güvenliği (Type Safety) uçtan uca otomatik.
@@ -230,9 +230,9 @@ Bir JSF sayfasına tıkladığınızda, sunucu tarafında bu **6 adım asla şa�
 
 
 
-![JSF Lifecycle Faz Akışı](images/jsf_lifecycle_phases.png)
+![JSF Lifecycle Faz Akışı](../../shared/assets/images/jsf_lifecycle_phases.png)
 
-![JSF Lifecycle Faz Akışı detaylı](images/jsf_lifecycle_phases_v2.png)  
+![JSF Lifecycle Faz Akışı detaylı](../../shared/assets/images/jsf_lifecycle_phases_v2.png)  
 
 
 
@@ -297,14 +297,14 @@ UI bileşenlerimiz (Button, Input, Panel) **nerede yaşıyor?** Bu sorunun cevab
 
 
 
-![Component Tree Yapısı (v2)](images/component_tree_uiviewroot_v2.png)
+![Component Tree Yapısı (v2)](../../shared/assets/images/component_tree_uiviewroot_v2.png)
 
 #### A. JSF: "Ağaç Sunucuda Yaşar"
 JSF'de `UIViewRoot` sunucu hafızasındadır (Heap). Tarayıcı sadece bir "yansıtıcıdır" (Renderer).
 *   **Avantaj:** Güvenli, veritabanına yakın.
 *   **Dezavantaj:** Sunucu belleği şişer (Session Replication derdi).
 
-[Component Tree Yapısı](images/component_tree_uiviewroot.png)
+[Component Tree Yapısı]../../shared/assets/images/component_tree_uiviewroot.png)
 
 #### B. React SPA: "Ağaç Tarayıcıya Taşındı"
 2010'larda ağacı söküp kullanıcının tarayıcısına (Virtual DOM) taşıdık.
@@ -321,14 +321,14 @@ Modern React (Next.js Server Actions), sadece veriyi değil, fonksiyonun o anki 
 > - **Client Side (Eski)**: Garson sana **Yemek Tarifi Kitabı** getirir. Sen masada oturup o tarife bakarak yemeği kendin yaparsın. *(Tarayıcı yorulur, JS indirir)*
 > - **Server Side (RSC)**: Aşçı mutfakta tarife bakar, yemeği yapar. Garson sana **Hazır Yemek** getirir. *(Tarayıcı sadece yer/gösterir)*
 
-![RSC Class Diyagramı](images/diagram_04_rsc_class.png)
+![RSC Class Diyagramı](../../shared/assets/images/diagram_04_rsc_class.png)
 
 #### Gizli Kahraman: Component Tree (UIViewRoot)
 
 !
   
 
-![Component Tree Evrimi](images/11_component_tree_evolution.png)
+![Component Tree Evrimi](../../shared/assets/images/11_component_tree_evolution.png)
 
 > [!TIP] Alternatif Görsel: **"Ayna Yansıması"**  
 > Sol tarafta HTML DOM (Tarayıcı). Sağ tarafta aynadaki yansıması: Java Nesne Ağacı (Sunucu). Birebir eşleşmeyi gösterir.
@@ -388,8 +388,8 @@ React'te "Virtual DOM" diye bir şey duydunuz değil mi? Tarayıcı hafızasınd
 </script>
 ```
 
-![PrimeFaces jQuery Üretimi](images/primefaces_jquery_generation.png)
-![PrimeFaces jQuery Üretimi (v2)](images/primefaces_jquery_generation_v2.png)  
+![PrimeFaces jQuery Üretimi](../../shared/assets/images/primefaces_jquery_generation.png)
+![PrimeFaces jQuery Üretimi (v2)](../../shared/assets/images/primefaces_jquery_generation_v2.png)  
 
 > [!TIP] Alternatif Görsel: **"Matruşka Bebek"**  
 > En dışta: JSF Component.  
@@ -405,7 +405,7 @@ React'te "Virtual DOM" diye bir şey duydunuz değil mi? Tarayıcı hafızasınd
 
 JSF'nin en az anlaşılan gücü: **"Write Once, Render Anywhere"**
 
-![Renderer Mekanizması](images/diagram_06_renderer.png)
+![Renderer Mekanizması](../../shared/assets/images/diagram_06_renderer.png)
 
 **Bileşen (Logic)** ile **Görüntü (Renderer)** ayrıdır:
 - Teorik olarak, JSF kodunuzu hiç değiştirmeden, sadece "Renderer" değiştirerek çıktıyı:
@@ -752,8 +752,8 @@ public class ProductBean implements Serializable {
 11. `UserForm.tsx`
 12. `UserPage.tsx`
 
-![12 Dosya vs 3 Dosya](images/file_explosion.png)
-![12 Dosya vs 3 Dosya detaylı](images/file_explosion_v2.png)  
+![12 Dosya vs 3 Dosya](../../shared/assets/images/file_explosion.png)
+![12 Dosya vs 3 Dosya detaylı](../../shared/assets/images/file_explosion_v2.png)  
 
 > [!TIP] Alternatif Görsel: **"Hazır Yemek vs Malzemeler"**  
 > JSF (3 Dosya): Paketlenmiş, ısıt-ye hazır yemek (Hızlı ama içeriği değiştiremezsin).  
@@ -814,7 +814,7 @@ const handleSubmit = async (e) => {
 ```
 **Görsel 1: Sol tarafta JSF'in 3 satırlık `save` metodu, sağ tarafta React'in aynı işi yapan dağıtık yapısı (Slice, Component, API).**
 
-![Simple vs Complex Code](images/comparison_save_user.png)
+![Simple vs Complex Code](../../shared/assets/images/comparison_save_user.png)
 
 ### Diğer SPA Sorunları
 
@@ -833,7 +833,7 @@ const handleSubmit = async (e) => {
 
 **Senaryo**: 10,000 kayıtlık kullanıcı listesi. Pagination, sorting, filtering.
 
-![Declarative vs Imperative Code](images/comparison_datatable.png)
+![Declarative vs Imperative Code](../../shared/assets/images/comparison_datatable.png)
 
 **Görsel 2: PrimeFaces'in declarative (ne istediğini söyle) yapısı vs React Table'ın imperative (nasıl yapılacağını söyle) kurulumu.**
 
@@ -855,7 +855,7 @@ const handleSubmit = async (e) => {
 
 **Senaryo**: "Kaydet" butonuna basınca sadece mesaj güncellensin (sayfa yenilenmesin).
 
-![What vs How Code](images/comparison_ajax.png)
+![What vs How Code](../../shared/assets/images/comparison_ajax.png)
 
 **Görsel 3: JSF'te AJAX sadece bir etikettir (`<f:ajax>`). React'te ise state yönetimi, hata yakalama ve loading durumlarını elle kodlamanız gerekir.Declarative vs Imperative**
 
@@ -863,8 +863,8 @@ const handleSubmit = async (e) => {
 
 ### Görünmeyen Kod: "Glue Code" Analizi
 
-![Buzdağı Analizi](images/glue_code_iceberg.png)
-![Buzdağı Analizi (v2)](images/glue_code_iceberg_v2.png)  
+![Buzdağı Analizi](../../shared/assets/images/glue_code_iceberg.png)
+![Buzdağı Analizi (v2)](../../shared/assets/images/glue_code_iceberg_v2.png)  
 
 > [!TIP] Alternatif Görsel: **"Koli Bandı Mimarisi (Duct Tape Architecture)"**  
 > Modern Stack: Harika görünen parçalar, ama hepsi birbirine koli bandıyla (Glue Code) tutturulmuş.  
@@ -910,7 +910,7 @@ SPA'nın sorunları giderek belirginleşti:
 - Component  tree sunucuda render  edilir
 - Server Actions sunucuda çalışır
 
-![Sarkaç Eve Döndü](/images/pendulum_returns.png)
+![Sarkaç Eve Döndü](../../shared/assets/images/pendulum_returns.png)
 
 <!-- 📸 GÖRSEL PROMPT: pendulum_returns.png
 Prompt: "A pendulum clock illustration with 3 marked positions:
@@ -984,7 +984,7 @@ Gelin, 20 yıl arayla yazılmış iki kod parçasına bakalım. Benzerlik şok e
 
 ### Senaryo: Bir Kullanıcıyı Kaydetmek
 
-![History Repeats Code](images/comparison_server_action.png)
+![History Repeats Code](../../shared/assets/images/comparison_server_action.png)
 
 **Görsel 4: Tarih tekerrür ediyor. 2006'daki Managed Bean metodu ile 2024'teki Server Action arasındaki şaşırtıcı benzerlik.**
 
@@ -1023,14 +1023,14 @@ Mimari seçimler sadece "hangi framework" sorusu değildir. **Verinin nereden ge
 
 
 
-![N+1 Query Problemi](/images/n_plus_one_problem.png)
+![N+1 Query Problemi](../../shared/assets/images/n_plus_one_problem.png)
 
-![N+1 Query Problemi](images/08_n_plus_one.png)
+![N+1 Query Problemi](../../shared/assets/images/08_n_plus_one.png)
 
 
 **Senaryo**: 100 kullanıcı listesi, her birinin departmanı gösterilecek.
 
-![N+1 Problem Karşılaştırması](images/diagram_08_n_plus_one.png)
+![N+1 Problem Karşılaştırması](../../shared/assets/images/diagram_08_n_plus_one.png)
 
 **JSF (Sunucu tarafı)**:
 ```java
@@ -1073,7 +1073,7 @@ const users = await fetch('/api/users'); // 1 istek
 | **Çok Veri** | ✅ Server Components (Admin, Dashboard) | ⚠️ SPA + GraphQL (E-ticaret) |
 | **Az Veri** | 🟢 Statik Site (Blog) | 🔵 SPA + REST (Chat, Real-time) |
 
-![Veri Yoğunluğu vs Etkileşim](images/diagram_09_data_intensity.png)
+![Veri Yoğunluğu vs Etkileşim](../../shared/assets/images/diagram_09_data_intensity.png)
 
 **Yorumlama:**
 - **Sol üst (Çok veri, az etkileşim)**: JSF/PrimeFaces veya Server Components ideal
@@ -1094,10 +1094,10 @@ const users = await fetch('/api/users'); // 1 istek
 
 ### Waterfall: Client'ta mı, Server'da mı?
 
-![Waterfall Karşılaştırması](images/waterfall_comparison.png)
+![Waterfall Karşılaştırması](../../shared/assets/images/waterfall_comparison.png)
 
 
-![Waterfall Karşılaştırması](/images/diagram_12_waterfall_comparison)
+![Waterfall Karşılaştırması](../../shared/assets/images/diagram_12_waterfall_comparison)
 
 
 **Client-side Data Fetching (SPA)**:
@@ -1118,9 +1118,9 @@ Sayfa yükle → JS parse → Veri iste → Bekle → Render → Alt veri iste �
 
 ### Kritik İçgörü: Data Proximity
 
-![Data Proximity Diagramı](images/13_data_proximity.png)
+![Data Proximity Diagramı](../../shared/assets/images/13_data_proximity.png)
 
-![Data Proximity Diagramı](/images/data_proximity_diagram.png)
+![Data Proximity Diagramı](../../shared/assets/images/data_proximity_diagram.png)
 <!-- ⚠️ EKSİK GÖRSEL: Bu dosya henüz oluşturulmamış -->
 
 <!-- 📸 GÖRSEL PROMPT: data_proximity_diagram.png
@@ -1147,9 +1147,9 @@ Boyut: 1000x1000px, Format: PNG -->
 ---
 
 ## 8️⃣ JSF'ten Öğrenmemiz Gerekenler: Kayıp Best Practice'ler
-![Best Practices Karşılaştırması](images/diagram_14_best_practices.png)
+![Best Practices Karşılaştırması](../../shared/assets/images/diagram_14_best_practices.png)
 
-![Best Practices Karşılaştırması](/images/best_practices_comparison.png)
+![Best Practices Karşılaştırması](../../shared/assets/images/best_practices_comparison.png)
 <!-- ⚠️ EKSİK GÖRSEL: Bu dosya henüz oluşturulmamış -->
 
 <!-- 📸 GÖRSEL PROMPT: best_practices_comparison.png
@@ -1508,7 +1508,7 @@ Mevcut SPA/SSR projenizde şu soruları sorun:
 
 ### Karar Ağacı (Decision Tree)
 
-![Karar Ağacı](images/diagram_10_decision_tree.png)
+![Karar Ağacı](../../shared/assets/images/diagram_10_decision_tree.png)
 
 ### Mimari Seçim Kriterleri
 
@@ -1547,7 +1547,7 @@ Mevcut SPA/SSR projenizde şu soruları sorun:
 
 Yazılım dünyası doğrusal bir çizgide ilerlemez; bir sarkaç gibi salınır. Biz şu an, sarkacın tekrar "Sunucu" (Server) tarafına döndüğü tarihi bir ana tanıklık ediyoruz.
 
-![Mimari Sarkaç](images/diagram_03_pendulum.png)
+![Mimari Sarkaç](../../shared/assets/images/diagram_03_pendulum.png)
 
 ### Aydınlanma Anı (The Aha! Moment)
 *   **Dün (JSF):** `h:commandButton` ile sunucudaki bir Java metodunu çağırırdık.
@@ -1606,9 +1606,9 @@ Yazılım dünyası doğrusal bir çizgide ilerlemez; bir sarkaç gibi salınır
 
 ## 🏁 Kapanış
 
-![Spiral Yükseliş](images/diagram_15_spiral_ascent.png)
+![Spiral Yükseliş](../../shared/assets/images/diagram_15_spiral_ascent.png)
 
-![Spiral Yükseliş](/images/spiral_ascent_final.png)
+![Spiral Yükseliş](../../shared/assets/images/spiral_ascent_final.png)
 <!-- ⚠️ EKSİK GÖRSEL: Bu dosya henüz oluşturulmamış -->
 
 <!-- 📸 GÖRSEL PROMPT: spiral_ascent_final.png
