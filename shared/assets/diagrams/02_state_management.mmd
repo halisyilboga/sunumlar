@@ -1,0 +1,42 @@
+flowchart TB
+    subgraph HEADER[" "]
+        direction LR
+        H1["STATE MANAGEMENT EVRIMI"]
+    end
+    
+    subgraph JSF_ERA["2006: JSF - Server-Centric"]
+        direction TB
+        JSF_UI["UI Component"] --> JSF_TREE["Component Tree"]
+        JSF_TREE --> JSF_VIEW["ViewState"]
+        JSF_VIEW --> JSF_SESSION["HTTP Session"]
+        JSF_SESSION --> JSF_RAM["Server RAM"]
+        
+        JSF_NOTE["Avantaj: Tek kaynak<br/>Dezavantaj: Memory tukenir"]
+    end
+    
+    subgraph SPA_ERA["2015: React SPA - Client-Centric"]
+        direction TB
+        SPA_UI["React Component"] --> SPA_STATE["useState/Redux"]
+        SPA_STATE --> SPA_STORE["Client Store"]
+        SPA_STORE --> SPA_MEM["Browser Memory"]
+        
+        SPA_NOTE["Avantaj: Server rahat<br/>Dezavantaj: Sync problemi"]
+    end
+    
+    subgraph RSC_ERA["2024: Next.js RSC - Hybrid"]
+        direction TB
+        RSC_SC["Server Component"] --> RSC_CLOSURE["Closure/Cache"]
+        RSC_CC["Client Component"] --> RSC_HOOK["React Hooks"]
+        RSC_CLOSURE --> RSC_EDGE["Edge/Server"]
+        RSC_HOOK --> RSC_BROWSER["Browser"]
+        
+        RSC_NOTE["Avantaj: Best of both<br/>Dezavantaj: Complexity"]
+    end
+    
+    JSF_ERA ==> SPA_ERA
+    SPA_ERA ==> RSC_ERA
+    
+    style JSF_ERA fill:#FFECB3,stroke:#FF6F00
+    style SPA_ERA fill:#B3E5FC,stroke:#0277BD
+    style RSC_ERA fill:#C8E6C9,stroke:#2E7D32
+    style HEADER fill:#37474F,stroke:#263238,color:#fff

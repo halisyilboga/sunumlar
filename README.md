@@ -1,58 +1,57 @@
-# Sunum Kurulum ve Çalıştırma Rehberi
+# 🐍 Sunumlar: Modüler Mimari Rehberi
 
-Bu proje, Quarto ve RevealJS kullanılarak hazırlanmış "Dijital Ouroboros" sunumunu içerir.
+Bu depo, modern yazılım mimarisi, yapay zeka ajanları ve gelecek çalışmaları üzerine hazırlanmış modüler içerikleri barındıran "Agentic-Ready" bir bilgi tabanıdır.
 
-## Gereksinimler
+## 🏗️ Mimari Yapı
 
-- **Quarto**: [Quarto CLI](https://quarto.org/docs/get-started/) yüklü olmalıdır.
-- **VS Code** (Önerilen): Quarto eklentisi ile birlikte.
+Proje, hem insanlar hem de AI ajanları tarafından kolayca navigasyon yapılabilecek şekilde katmanlı bir yapıda organize edilmiştir:
 
-## Sunumu Sıfırdan Oluşturma ve Çalıştırma
-
-Sunum dosyası `presentation.qmd` (veya `@presentation.md` olarak referans verdiğiniz dosya) ana kaynak dosyasıdır.
-
-### 1. Terminali Açın
-Proje dizininde (`/Users/halis.yilboga/developer/ws/deneme`) bir terminal açın.
-
-### 2. Önbelleği Temizleyin (Opsiyonel ama Önerilir)
-Eğer daha önce build aldıysanız ve temiz bir başlangıç istiyorsanız:
-
-```bash
-rm -rf presentation_files presentation.html
+```text
+.
+├── modules/                # Tematik odak noktaları
+│   ├── jsf-modern-arch/    # JSF vs Modern Mimari (Quarto)
+│   ├── ai-developer-era/   # Yapay Zeka ve Mimari Etik
+│   ├── future-studies/     # Gelecek araştırmaları
+│   └── analysis/           # Derinlemesine mimari analizler
+├── shared/                 # Ortak kaynaklar ve varlıklar
+│   ├── assets/             # Görseller, diyagramlar
+│   ├── styles/             # Global CSS temaları (cinematic.css)
+│   └── components/         # Ortak UI bileşenleri
+├── agents/                 # AI Ajan konfigürasyonları ve promptlar
+├── scripts/                # Otomasyon ve kurulum scriptleri
+└── maindocs/               # Birleştirilmiş ana dökümantasyon
 ```
 
-### 3. Sunumu Derleyin ve Önizleyin
-Aşağıdaki komut sunumu derler ve varsayılan tarayıcınızda açar. Dosyada değişiklik yaptığınızda otomatik olarak yenilenir.
+## 🚀 Sunumları Çalıştırma (Quarto)
+
+Bu proje [Quarto CLI](https://quarto.org/docs/get-started/) kullanılarak derlenir.
+
+### JSF ve Modern Mimari Sunumu
+
+Sunumu önizlemek için ilgili modül dizinine gitmenize gerek kalmadan kök dizinden şu komutu çalıştırabilirsiniz:
 
 ```bash
-quarto preview presentation.qmd
+quarto preview modules/jsf-modern-architecture/content.qmd
 ```
 
-**Alternatif Port:**
-Eğer port çakışması yaşarsanız:
+**Alternatif olarak HTML olarak derlemek için:**
 ```bash
-quarto preview presentation.qmd --port 7415
+quarto render modules/jsf-modern-architecture/content.qmd
 ```
 
-## Sunumu Statik Olarak Oluşturma (HTML)
+## 🎨 Tasarım Sistemi
 
-Sunumu bir dosya olarak paylaşmak veya internet olmadan çalıştırmak isterseniz:
+Proje, **Cinematic RevealJS** temasını kullanır. Tüm modüller `/shared/styles/cinematic.css` dosyasından beslenir. Bu sayede görsel tutarlılık ve merkezi kontrol sağlanır.
 
-```bash
-quarto render presentation.qmd
-```
+### Görsel Varlıklar
+Tüm diyagramlar ve görüntüler `/shared/assets/` altında toplanmıştır. Dökümanlarda bu dosyalara relative path ile (örn: `../../shared/assets/images/...`) erişilmelidir.
 
-Bu komut `presentation.html` dosyasını oluşturur. Bu dosyayı herhangi bir tarayıcıda açarak sunumu yapabilirsiniz.
+## 🤖 AI Ajanları İçin Notlar
 
-## Sunum Kontrolleri
+Bu repo, AI ajanlarının (Antigravity vb.) projeyi tam olarak anlayabilmesi için optimize edilmiştir:
+- **Modüler Yapı**: Her konu kendi içinde izole edilmiştir.
+- **Standart Yollar**: `shared/` dizini tüm ortak bağımlılıkları barındırır.
+- **Açık İsimlendirme**: `guide.md` derin teknik içerik, `content.qmd` sunum katmanıdır.
 
-- **İleri/Geri:** Yön tuşları veya Space
-- **Genel Bakış:** `Esc` tuşu (Tüm slaytları kuş bakışı görürsünüz)
-- **Tam Ekran:** `F` tuşu
-- **Sunucu Notları:** `S` tuşu
-
-## Sorun Giderme
-
-- **Görseller Görünmüyor:** `images/` klasörünün proje kök dizininde olduğundan emin olun.
-- **Slaytlar Döngüye Giriyor:** `presentation.qmd` içindeki `loop: false` ayarını kontrol edin.
-- **Stil Bozuk:** `cinematic.css` dosyasının mevcut olduğundan emin olun.
+---
+*Son Güncelleme: 2024-04-03 - Modüler Mimari Reorganizasyonu Tamamlandı*

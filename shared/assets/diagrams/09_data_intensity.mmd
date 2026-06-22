@@ -1,0 +1,57 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["VERI YOGUNLUGU vs ETKILESIM MATRISI"]
+    end
+    
+    subgraph MATRIX["MIMARI SECIM REHBERI"]
+        direction TB
+        
+        subgraph HIGH_DATA["COK VERI"]
+            direction LR
+            
+            subgraph HD_LOW["Az Etkilesim"]
+                HD_L1["Admin Panel"]
+                HD_L2["Raporlama"]
+                HD_L3["Dashboard"]
+                HD_TECH["IDEAL: JSF, RSC<br/>DataTable, Charts<br/>Server-side render"]
+            end
+            
+            subgraph HD_HIGH["Cok Etkilesim"]
+                HD_H1["E-ticaret"]
+                HD_H2["Trading Platform"]
+                HD_H3["Real-time Analytics"]
+                HD_TECH2["IDEAL: GraphQL + React<br/>WebSocket updates<br/>Optimistic UI"]
+            end
+        end
+        
+        subgraph LOW_DATA["AZ VERI"]
+            direction LR
+            
+            subgraph LD_LOW["Az Etkilesim"]
+                LD_L1["Blog"]
+                LD_L2["Dokumantasyon"]
+                LD_L3["Landing Page"]
+                LD_TECH["IDEAL: Static Site<br/>Astro, Hugo<br/>CDN Cache"]
+            end
+            
+            subgraph LD_HIGH["Cok Etkilesim"]
+                LD_H1["Chat App"]
+                LD_H2["Collaborative Editor"]
+                LD_H3["Game UI"]
+                LD_TECH2["IDEAL: SPA + WebSocket<br/>React + Socket.io<br/>Local-first"]
+            end
+        end
+    end
+    
+    subgraph LEGEND["ACIKLAMA"]
+        direction LR
+        LEG1["Yesil = Server-side ideal"]
+        LEG2["Mavi = Client-side ideal"]
+        LEG3["Turuncu = Hybrid ideal"]
+    end
+    
+    style HD_LOW fill:#C8E6C9,stroke:#1B5E20
+    style HD_HIGH fill:#FFE0B2,stroke:#E65100
+    style LD_LOW fill:#E8F5E9,stroke:#388E3C
+    style LD_HIGH fill:#BBDEFB,stroke:#1565C0
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

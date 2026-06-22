@@ -1,0 +1,61 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["COMPONENT TREE EVRIMI: UI Nerede Yasiyor?"]
+    end
+    
+    subgraph ERA_JSF["2006: JSF - Agac Sunucuda"]
+        direction TB
+        
+        JSF_SERVER["SUNUCU"]
+        JSF_TREE["Component Tree<br/>UIViewRoot<br/>  UIForm<br/>    UIInput<br/>    UICommand"]
+        JSF_STATE["ViewState<br/>Serialized Tree"]
+        JSF_MEM["Server RAM<br/>Session Memory"]
+        
+        JSF_SERVER --> JSF_TREE
+        JSF_TREE --> JSF_STATE
+        JSF_STATE --> JSF_MEM
+        
+        JSF_BROWSER["BROWSER<br/>Sadece HTML<br/>JavaScript: Minimal"]
+        JSF_TREE -->|"Render HTML"| JSF_BROWSER
+    end
+    
+    subgraph ERA_SPA["2015: React SPA - Agac Tarayicida"]
+        direction TB
+        
+        SPA_SERVER["SUNUCU<br/>Sadece REST API<br/>JSON response"]
+        
+        SPA_BROWSER["BROWSER"]
+        SPA_VDOM["Virtual DOM<br/>React Element Tree<br/>Reconciliation"]
+        SPA_DOM["Real DOM<br/>Hydrated UI"]
+        SPA_STATE["Client State<br/>Redux Store<br/>Context"]
+        
+        SPA_SERVER -->|"JSON Data"| SPA_BROWSER
+        SPA_BROWSER --> SPA_VDOM
+        SPA_VDOM --> SPA_DOM
+        SPA_VDOM --> SPA_STATE
+    end
+    
+    subgraph ERA_RSC["2024: RSC - Hibrit Agac"]
+        direction TB
+        
+        RSC_SERVER["SUNUCU"]
+        RSC_SC["Server Components<br/>Govde: Layout, Data<br/>DB Access, Secrets"]
+        
+        RSC_STREAM["RSC Payload<br/>Streaming HTML"]
+        
+        RSC_BROWSER["BROWSER"]
+        RSC_CC["Client Components<br/>Yapraklar: Interactive<br/>useState, onClick"]
+        
+        RSC_SERVER --> RSC_SC
+        RSC_SC -->|"HTML Stream"| RSC_STREAM
+        RSC_STREAM --> RSC_BROWSER
+        RSC_BROWSER --> RSC_CC
+    end
+    
+    ERA_JSF ==>|"Mobile Era"| ERA_SPA
+    ERA_SPA ==>|"Complexity Crisis"| ERA_RSC
+    
+    style ERA_JSF fill:#FFECB3,stroke:#FF6F00
+    style ERA_SPA fill:#BBDEFB,stroke:#1565C0
+    style ERA_RSC fill:#C8E6C9,stroke:#2E7D32
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

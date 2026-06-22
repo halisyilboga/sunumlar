@@ -1,0 +1,55 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["WATERFALL KARSILASTIRMASI: Ayni Sayfa, Farkli Mimari"]
+    end
+    
+    subgraph SPA_FLOW["CLIENT-SIDE SPA - Toplam: ~800ms"]
+        direction LR
+        
+        SPA_1["1. HTML Shell<br/>50ms"]
+        SPA_2["2. JS Download<br/>200ms<br/>350KB Bundle"]
+        SPA_3["3. JS Parse<br/>100ms<br/>CPU Intensive"]
+        SPA_4["4. React Hydrate<br/>50ms"]
+        SPA_5["5. API Call #1<br/>150ms<br/>GET /users"]
+        SPA_6["6. Render Wait<br/>Loading..."]
+        SPA_7["7. API Call #2<br/>150ms<br/>GET /deps"]
+        SPA_8["8. Final Render<br/>100ms"]
+        
+        SPA_1 --> SPA_2 --> SPA_3 --> SPA_4 --> SPA_5 --> SPA_6 --> SPA_7 --> SPA_8
+    end
+    
+    subgraph SSR_FLOW["SERVER-SIDE JSF/RSC - Toplam: ~200ms"]
+        direction LR
+        
+        SSR_1["1. Request<br/>10ms"]
+        SSR_2["2. DB Query<br/>50ms<br/>Parallel JOIN"]
+        SSR_3["3. Template<br/>30ms<br/>HTML Generate"]
+        SSR_4["4. Response<br/>10ms"]
+        SSR_5["5. Browser Paint<br/>100ms<br/>Ready!"]
+        
+        SSR_1 --> SSR_2 --> SSR_3 --> SSR_4 --> SSR_5
+    end
+    
+    subgraph METRICS["KARSILASTIRMA"]
+        direction LR
+        
+        subgraph M_SPA["SPA"]
+            M_SPA_1["TTI: 800ms"]
+            M_SPA_2["JS: 350KB"]
+            M_SPA_3["Round-trips: 3+"]
+            M_SPA_4["SEO: Zor"]
+        end
+        
+        subgraph M_SSR["SSR/JSF"]
+            M_SSR_1["TTI: 200ms"]
+            M_SSR_2["JS: 50KB"]
+            M_SSR_3["Round-trips: 1"]
+            M_SSR_4["SEO: Mukemmel"]
+        end
+    end
+    
+    style SPA_FLOW fill:#FFEBEE,stroke:#C62828
+    style SSR_FLOW fill:#E8F5E9,stroke:#2E7D32
+    style M_SPA fill:#FFCDD2,stroke:#B71C1C
+    style M_SSR fill:#C8E6C9,stroke:#1B5E20
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

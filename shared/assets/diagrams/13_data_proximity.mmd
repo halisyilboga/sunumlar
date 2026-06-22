@@ -1,0 +1,52 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["DATA PROXIMITY: Veri Ne Kadar Uzakta?"]
+    end
+    
+    subgraph CENTER["VERI MERKEZI"]
+        DB[("DATABASE<br/>PostgreSQL<br/>Source of Truth")]
+    end
+    
+    subgraph ZONE1["ZONE 1: Ayni JVM - ~1ms"]
+        direction TB
+        Z1_DESC["JSF + JPA<br/>EntityManager"]
+        Z1_TECH["Direct JDBC<br/>Connection Pool"]
+        Z1_LATENCY["Latency: 1-5ms<br/>No Network"]
+        Z1_EXAMPLE["userService.findAll()"]
+    end
+    
+    subgraph ZONE2["ZONE 2: Ayni Sunucu - ~10ms"]
+        direction TB
+        Z2_DESC["Next.js RSC<br/>Server Component"]
+        Z2_TECH["Prisma / Drizzle<br/>Local Socket"]
+        Z2_LATENCY["Latency: 5-20ms<br/>Localhost"]
+        Z2_EXAMPLE["await db.user.findMany()"]
+    end
+    
+    subgraph ZONE3["ZONE 3: Ayni Region - ~50ms"]
+        direction TB
+        Z3_DESC["REST API<br/>Microservice"]
+        Z3_TECH["HTTP Call<br/>Same VPC"]
+        Z3_LATENCY["Latency: 20-100ms<br/>Network Hop"]
+        Z3_EXAMPLE["fetch('/api/users')"]
+    end
+    
+    subgraph ZONE4["ZONE 4: Internet - ~200ms+"]
+        direction TB
+        Z4_DESC["SPA in Browser<br/>Client-side Fetch"]
+        Z4_TECH["Public Internet<br/>CDN, SSL, DNS"]
+        Z4_LATENCY["Latency: 100-500ms<br/>Multiple Hops"]
+        Z4_EXAMPLE["axios.get('/users')"]
+    end
+    
+    DB ==> ZONE1
+    DB ==> ZONE2
+    DB ==> ZONE3
+    ZONE3 ==> ZONE4
+    
+    style ZONE1 fill:#C8E6C9,stroke:#1B5E20
+    style ZONE2 fill:#DCEDC8,stroke:#33691E
+    style ZONE3 fill:#FFF9C4,stroke:#F9A825
+    style ZONE4 fill:#FFCDD2,stroke:#C62828
+    style CENTER fill:#E3F2FD,stroke:#1565C0
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

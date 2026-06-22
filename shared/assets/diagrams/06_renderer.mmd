@@ -1,0 +1,62 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["JSF RENDERER PATTERN: Write Once, Render Anywhere"]
+    end
+    
+    subgraph COMPONENT["UI COMPONENT - Logic Layer"]
+        direction TB
+        C1["UICommand"]
+        C2["Properties:<br/>action, value, disabled"]
+        C3["Behavior:<br/>ActionEvent, Queue"]
+        C1 --- C2 --- C3
+    end
+    
+    subgraph RENDERERS["RENDERER KIT - Presentation Layer"]
+        direction LR
+        
+        subgraph HTML_R["HTML Renderer"]
+            H1["encodeBegin"]
+            H2["encodeChildren"]
+            H3["encodeEnd"]
+        end
+        
+        subgraph PDF_R["PDF Renderer"]
+            PDF1["PdfGraphics"]
+            PDF2["Font mapping"]
+        end
+        
+        subgraph JSON_R["JSON Renderer"]
+            J1["REST API output"]
+            J2["Headless mode"]
+        end
+        
+        subgraph MOBILE_R["Mobile Renderer"]
+            M1["Native XML"]
+            M2["Touch events"]
+        end
+    end
+    
+    subgraph OUTPUTS["OUTPUT FORMATS"]
+        direction LR
+        O1["button class=ui-btn<br/>onclick=submit"]
+        O2["PDF Document<br/>Print-ready"]
+        O3["{action: save}<br/>API Response"]
+        O4["UIButton<br/>iOS/Android"]
+    end
+    
+    COMPONENT ==> HTML_R
+    COMPONENT ==> PDF_R
+    COMPONENT ==> JSON_R
+    COMPONENT ==> MOBILE_R
+    
+    HTML_R ==> O1
+    PDF_R ==> O2
+    JSON_R ==> O3
+    MOBILE_R ==> O4
+    
+    style COMPONENT fill:#FFECB3,stroke:#FF6F00
+    style HTML_R fill:#E3F2FD,stroke:#1565C0
+    style PDF_R fill:#FCE4EC,stroke:#C2185B
+    style JSON_R fill:#E8F5E9,stroke:#2E7D32
+    style MOBILE_R fill:#F3E5F5,stroke:#7B1FA2
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

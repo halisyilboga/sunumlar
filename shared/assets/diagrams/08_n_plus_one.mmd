@@ -1,0 +1,49 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["N+1 QUERY PROBLEMI: Server vs Client"]
+    end
+    
+    subgraph SCENARIO["SENARYO: 100 kullanici listele, her birinin departmanini goster"]
+        S["users.map - user.department.name"]
+    end
+    
+    subgraph JSF_SIDE["JSF / SERVER-SIDE COZUM"]
+        direction TB
+        
+        JSF_DB[(Database)]
+        JSF_SERVER["Java Server"]
+        JSF_BROWSER["Browser"]
+        
+        JSF_Q1["SELECT u.*, d.name<br/>FROM users u<br/>JOIN departments d<br/>ON u.dept_id = d.id"]
+        
+        JSF_DB -->|"1 SQL Query<br/>JOIN ile"| JSF_SERVER
+        JSF_SERVER -->|"Hazir HTML<br/>100 satir tablo"| JSF_BROWSER
+        
+        JSF_RESULT["SONUC: 1 Query<br/>Latency: ~50ms<br/>Network: 1 round-trip"]
+    end
+    
+    subgraph SPA_SIDE["REACT SPA / CLIENT-SIDE PROBLEM"]
+        direction TB
+        
+        SPA_BROWSER["Browser"]
+        SPA_API["REST API"]
+        SPA_DB[(Database)]
+        
+        SPA_Q1["GET /api/users"]
+        SPA_Q2["GET /api/departments/1<br/>GET /api/departments/2<br/>...<br/>GET /api/departments/100"]
+        
+        SPA_BROWSER -->|"1. Fetch users"| SPA_API
+        SPA_API -->|"1 Query"| SPA_DB
+        SPA_DB -->|"100 users JSON"| SPA_API
+        SPA_API -->|"Response"| SPA_BROWSER
+        SPA_BROWSER -->|"2. Lazy load each dept"| SPA_API
+        SPA_API -->|"100 Queries!"| SPA_DB
+        
+        SPA_RESULT["SONUC: 101 Queries!<br/>Latency: ~2000ms<br/>Network: 101 round-trips"]
+    end
+    
+    style JSF_SIDE fill:#E8F5E9,stroke:#1B5E20
+    style SPA_SIDE fill:#FFEBEE,stroke:#C62828
+    style JSF_RESULT fill:#4CAF50,stroke:#1B5E20,color:#fff
+    style SPA_RESULT fill:#F44336,stroke:#B71C1C,color:#fff
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

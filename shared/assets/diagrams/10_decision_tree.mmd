@@ -1,0 +1,44 @@
+flowchart TD
+    subgraph TITLE[" "]
+        T["MIMARI KARAR AGACI"]
+    end
+    
+    START["Yeni Proje Basliyor"] --> Q1
+    
+    Q1{"Hedef Kitle?"}
+    Q1 -->|"B2C - Halka Acik<br/>SEO Kritik"| PATH_B2C
+    Q1 -->|"B2B - Kurumsal<br/>Intranet/Internal"| Q2
+    
+    subgraph PATH_B2C["B2C YOLU"]
+        B2C_Q{"Dinamik UI?"}
+        B2C_Q -->|"Evet - E-commerce"| B2C_NEXT["Next.js App Router<br/>RSC + Server Actions"]
+        B2C_Q -->|"Hayir - Blog/Docs"| B2C_STATIC["Astro / Hugo<br/>Static Site Gen"]
+    end
+    
+    Q2{"Frontend Uzmani<br/>Var mi?"}
+    Q2 -->|"Evet<br/>React/Vue Bilen"| Q3
+    Q2 -->|"Hayir<br/>Sadece Java/Backend"| Q4
+    
+    Q3{"UX Ne Kadar<br/>Onemli?"}
+    Q3 -->|"Cok Onemli<br/>Custom Design"| PATH_SPA["React SPA<br/>Tam Kontrol<br/>Tailwind + Framer"]
+    Q3 -->|"Standart UI<br/>Form/Tablo"| Q4
+    
+    Q4{"UI Karmasikligi?"}
+    Q4 -->|"Yuksek<br/>Grid, Rapor, Chart"| PATH_JSF["JSF + PrimeFaces<br/>veya Vaadin<br/>100+ hazir component"]
+    Q4 -->|"Dusuk<br/>Basit CRUD"| PATH_SIMPLE["Thymeleaf + HTMX<br/>veya Blazor<br/>Minimal JS"]
+    
+    subgraph RESULTS["SONUCLAR"]
+        direction LR
+        R1["Next.js: SEO + Modern DX"]
+        R2["SPA: Maximum UX Control"]
+        R3["JSF: Enterprise Hiz"]
+        R4["HTMX: Simplicty"]
+    end
+    
+    style PATH_B2C fill:#E1F5FE,stroke:#0277BD
+    style PATH_SPA fill:#FCE4EC,stroke:#C2185B
+    style PATH_JSF fill:#FFF3E0,stroke:#E65100
+    style PATH_SIMPLE fill:#F3E5F5,stroke:#7B1FA2
+    style B2C_NEXT fill:#00BCD4,stroke:#006064,color:#fff
+    style B2C_STATIC fill:#4DB6AC,stroke:#004D40,color:#fff
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

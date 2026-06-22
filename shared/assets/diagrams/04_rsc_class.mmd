@@ -1,0 +1,46 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["REACT SERVER COMPONENTS ANATOMISI"]
+    end
+    
+    subgraph SERVER["SUNUCU TARAFI - Server Components"]
+        direction TB
+        SC1["page.tsx<br/>async function"]
+        SC2["layout.tsx<br/>Shared wrapper"]
+        SC3["DB Query<br/>Direct access"]
+        SC4["API Keys<br/>Secure, hidden"]
+        
+        SC1 --> SC3
+        SC2 --> SC1
+        SC3 --> SC4
+        
+        SC_OUT["Output: HTML + RSC Payload<br/>JavaScript: 0 KB"]
+    end
+    
+    subgraph CLIENT["TARAYICI TARAFI - Client Components"]
+        direction TB
+        CC1["'use client'<br/>Interactive UI"]
+        CC2["useState<br/>Local state"]
+        CC3["onClick<br/>Event handlers"]
+        CC4["useEffect<br/>Side effects"]
+        
+        CC1 --> CC2
+        CC1 --> CC3
+        CC2 --> CC4
+        
+        CC_OUT["Output: Hydrated React<br/>JavaScript: Bundle size"]
+    end
+    
+    subgraph BOUNDARY["SINIR - The Boundary"]
+        B1["Props: Serializable only<br/>string, number, JSON"]
+        B2["No functions<br/>No classes"]
+        B3["No context<br/>Re-fetch needed"]
+    end
+    
+    SERVER ==>|"HTML Stream"| BOUNDARY
+    BOUNDARY ==>|"Hydration"| CLIENT
+    
+    style SERVER fill:#E8F5E9,stroke:#1B5E20
+    style CLIENT fill:#E3F2FD,stroke:#1565C0
+    style BOUNDARY fill:#FFF3E0,stroke:#E65100
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

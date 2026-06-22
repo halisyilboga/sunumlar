@@ -1,0 +1,19 @@
+flowchart LR
+    subgraph D1["2000-2010"]
+        A[Sunucu Odakli - JSF, ASP.NET]
+    end
+    
+    subgraph D2["2010-2023"]
+        B[Istemci Odakli - React, Angular]
+    end
+    
+    subgraph D3["2024+"]
+        C[Hibrit - Next.js, RSC]
+    end
+    
+    A -->|Sarkac saga| B
+    B -->|Sarkac sola| C
+    
+    style A fill:#ff9999
+    style B fill:#99ccff
+    style C fill:#99ff99

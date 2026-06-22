@@ -1,0 +1,83 @@
+flowchart TB
+    subgraph TITLE[" "]
+        T["KARMASIKLIK EGRISI: Proje Buyudukce Ne Olur?"]
+    end
+    
+    subgraph SIMPLE["BASIT PROJE - Todo App, Landing Page"]
+        direction LR
+        
+        subgraph S_SPA["React SPA"]
+            S1A["10 dosya"]
+            S1B["2 hafta"]
+            S1C["Basit ama boilerplate"]
+        end
+        
+        subgraph S_SSR["Next.js SSR"]
+            S2A["5 dosya"]
+            S2B["1 hafta"]
+            S2C["Hizli baslangic"]
+        end
+        
+        subgraph S_JSF["JSF + PrimeFaces"]
+            S3A["3 dosya"]
+            S3B["3 gun"]
+            S3C["En hizli"]
+        end
+    end
+    
+    subgraph MEDIUM["ORTA PROJE - E-commerce, CRM"]
+        direction LR
+        
+        subgraph M_SPA["React SPA"]
+            M1A["50+ dosya"]
+            M1B["2 ay"]
+            M1C["Redux, Router, Query"]
+        end
+        
+        subgraph M_SSR["Next.js SSR"]
+            M2A["25 dosya"]
+            M2B["1 ay"]
+            M2C["Server Actions"]
+        end
+        
+        subgraph M_JSF["JSF + PrimeFaces"]
+            M3A["15 dosya"]
+            M3B["2 hafta"]
+            M3C["DataTable, Dialog"]
+        end
+    end
+    
+    subgraph ENTERPRISE["ENTERPRISE - ERP, Banking"]
+        direction LR
+        
+        subgraph E_SPA["React SPA - TEHLIKE"]
+            E1A["200+ dosya"]
+            E1B["6+ ay"]
+            E1C["KARMASIKLIK PATLAMASI<br/>State sync kabusu"]
+        end
+        
+        subgraph E_SSR["Next.js SSR - IYI"]
+            E2A["80 dosya"]
+            E2B["3 ay"]
+            E2C["Yonetilebilir<br/>Type-safe"]
+        end
+        
+        subgraph E_JSF["JSF - IDEAL"]
+            E3A["60 dosya"]
+            E3B["2 ay"]
+            E3C["Battle-tested<br/>20 yil prod"]
+        end
+    end
+    
+    SIMPLE ==> MEDIUM ==> ENTERPRISE
+    
+    style S_SPA fill:#FFCDD2,stroke:#C62828
+    style S_SSR fill:#C8E6C9,stroke:#2E7D32
+    style S_JSF fill:#BBDEFB,stroke:#1565C0
+    style M_SPA fill:#FFCDD2,stroke:#C62828
+    style M_SSR fill:#C8E6C9,stroke:#2E7D32
+    style M_JSF fill:#BBDEFB,stroke:#1565C0
+    style E_SPA fill:#F44336,stroke:#B71C1C,color:#fff
+    style E_SSR fill:#4CAF50,stroke:#1B5E20,color:#fff
+    style E_JSF fill:#2196F3,stroke:#0D47A1,color:#fff
+    style TITLE fill:#37474F,stroke:#263238,color:#fff

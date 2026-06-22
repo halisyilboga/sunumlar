@@ -1,0 +1,51 @@
+flowchart LR
+    subgraph ERA1["2000-2005: PHP CAGI"]
+        direction TB
+        P1["Tek dosya = Her sey<br/>index.php"]
+        P2["SQL + HTML karisik<br/>Spaghetti Code"]
+        P3["Hizli prototip<br/>Bakimi zor"]
+        P1 --- P2 --- P3
+    end
+    
+    subgraph ERA2["2003-2010: JSF DEVRIMI"]
+        direction TB
+        J1["Component Model<br/>UI = Java Objects"]
+        J2["6-Phase Lifecycle<br/>Strict Discipline"]
+        J3["ViewState<br/>Server Memory"]
+        J1 --- J2 --- J3
+    end
+    
+    subgraph ERA3["2008-2015: PRIMEFACES"]
+        direction TB
+        PF1["100+ Rich Components<br/>DataTable, Charts"]
+        PF2["AJAX Built-in<br/>Partial Page Update"]
+        PF3["Enterprise Standard<br/>Banks, Gov"]
+        PF1 --- PF2 --- PF3
+    end
+    
+    subgraph ERA4["2010-2020: SPA ERA"]
+        direction TB
+        S1["React / Angular / Vue<br/>Client-side Rendering"]
+        S2["REST API Explosion<br/>Frontend-Backend Split"]
+        S3["Complexity Explosion<br/>10+ files per feature"]
+        S1 --- S2 --- S3
+    end
+    
+    subgraph ERA5["2020-2026: MODERN SSR"]
+        direction TB
+        M1["Next.js / Nuxt / Remix<br/>Server Components"]
+        M2["Server Actions<br/>Like JSF CommandButton"]
+        M3["Best of Both<br/>Full Circle"]
+        M1 --- M2 --- M3
+    end
+    
+    ERA1 ==>|"Enterprise Need"| ERA2
+    ERA2 ==>|"Rich UI Need"| ERA3
+    ERA3 ==>|"Mobile + SPA Hype"| ERA4
+    ERA4 ==>|"Complexity Crisis"| ERA5
+    
+    style ERA1 fill:#FFCCBC,stroke:#BF360C
+    style ERA2 fill:#C8E6C9,stroke:#1B5E20
+    style ERA3 fill:#B3E5FC,stroke:#01579B
+    style ERA4 fill:#F8BBD9,stroke:#880E4F
+    style ERA5 fill:#C5CAE9,stroke:#1A237E

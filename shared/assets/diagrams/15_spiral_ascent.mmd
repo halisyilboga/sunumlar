@@ -1,0 +1,19 @@
+graph BT
+    A[JSF 2006 - Server Monolith] --> B[SPA 2015 - Client Heavy]
+    B --> C[RSC 2024 - Best of Both]
+    
+    A --- A1[Component Model]
+    A --- A2[Lifecycle]
+    A --- A3[ViewState]
+    
+    B --- B1[Virtual DOM]
+    B --- B2[State Management]
+    B --- B3[API Layer]
+    
+    C --- C1[Server Components]
+    C --- C2[Server Actions]
+    C --- C3[Streaming]
+    
+    style A fill:#FFB6C1
+    style B fill:#87CEEB
+    style C fill:#90EE90

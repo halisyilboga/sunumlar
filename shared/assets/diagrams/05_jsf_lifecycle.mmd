@@ -1,0 +1,78 @@
+flowchart TD
+    subgraph REQUEST["HTTP REQUEST - Browser'dan Gelen"]
+        direction LR
+        REQ1["POST /faces/page.xhtml"]
+        REQ2["Form Data<br/>ViewState Token"]
+    end
+    
+    subgraph PHASE1["PHASE 1: RESTORE VIEW"]
+        direction TB
+        P1A["ViewState decode"]
+        P1B["Component Tree rebuild"]
+        P1C["Event queue restore"]
+        P1A --> P1B --> P1C
+    end
+    
+    subgraph PHASE2["PHASE 2: APPLY REQUEST VALUES"]
+        direction TB
+        P2A["HTTP params parse"]
+        P2B["setSubmittedValue"]
+        P2C["Queued events"]
+        P2A --> P2B --> P2C
+    end
+    
+    subgraph PHASE3["PHASE 3: PROCESS VALIDATIONS"]
+        direction TB
+        P3A["Converters run<br/>String to Object"]
+        P3B["Validators run<br/>Required, Length, Regex"]
+        P3C["FacesMessage if error"]
+        P3A --> P3B --> P3C
+    end
+    
+    subgraph PHASE4["PHASE 4: UPDATE MODEL"]
+        direction TB
+        P4A["setValue on bean"]
+        P4B["EL expression resolve"]
+        P4C["Managed Bean update"]
+        P4A --> P4B --> P4C
+    end
+    
+    subgraph PHASE5["PHASE 5: INVOKE APPLICATION"]
+        direction TB
+        P5A["Action method call"]
+        P5B["Navigation handling"]
+        P5C["Business logic"]
+        P5A --> P5B --> P5C
+    end
+    
+    subgraph PHASE6["PHASE 6: RENDER RESPONSE"]
+        direction TB
+        P6A["Renderer.encode"]
+        P6B["HTML generation"]
+        P6C["ViewState encode"]
+        P6A --> P6B --> P6C
+    end
+    
+    subgraph RESPONSE["HTTP RESPONSE"]
+        RES["HTML + New ViewState"]
+    end
+    
+    REQUEST ==> PHASE1
+    PHASE1 ==> PHASE2
+    PHASE2 ==> PHASE3
+    PHASE3 ==>|"Valid"| PHASE4
+    PHASE3 -.->|"Invalid: Skip to Render"| PHASE6
+    PHASE4 ==> PHASE5
+    PHASE5 ==> PHASE6
+    PHASE6 ==> RESPONSE
+    
+    RESPONSE -.->|"Postback: Cycle repeats"| REQUEST
+    
+    style PHASE1 fill:#E3F2FD,stroke:#1565C0
+    style PHASE2 fill:#E8F5E9,stroke:#2E7D32
+    style PHASE3 fill:#FFF3E0,stroke:#EF6C00
+    style PHASE4 fill:#F3E5F5,stroke:#7B1FA2
+    style PHASE5 fill:#FFEBEE,stroke:#C62828
+    style PHASE6 fill:#E0F7FA,stroke:#00838F
+    style REQUEST fill:#ECEFF1,stroke:#455A64
+    style RESPONSE fill:#C8E6C9,stroke:#2E7D32

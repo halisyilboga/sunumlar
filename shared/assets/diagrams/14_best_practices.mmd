@@ -1,0 +1,25 @@
+graph LR
+    subgraph JSF["JSF 2006 - Enforced"]
+        J1[Server Validation]
+        J2[CSRF Protection]
+        J3[Type Safety]
+        J4[Lifecycle]
+        J5[Central Errors]
+        J6[Server State]
+    end
+    
+    subgraph Modern["Modern 2024 - Optional"]
+        M1[Zod Validation]
+        M2[CSRF Token]
+        M3[TypeScript]
+        M4[useEffect]
+        M5[Error Boundary]
+        M6[React Query]
+    end
+    
+    J1 -.-> M1
+    J2 -.-> M2
+    J3 -.-> M3
+    J4 -.-> M4
+    J5 -.-> M5
+    J6 -.-> M6
