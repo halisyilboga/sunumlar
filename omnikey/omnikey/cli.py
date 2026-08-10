@@ -39,6 +39,29 @@ from omnikey.watcher import ConfigWatcher
 
 def cmd_sync(args, db: Database) -> None:
     """Scan and synchronize all configuration files."""
+    custom_path = getattr(args, "path", None)
+    if custom_path:
+        target_path = Path(custom_path).expanduser().resolve()
+        if not target_path.exists():
+            print(f"{RED}Error: Path '{target_path}' does not exist.{RESET}")
+            return
+        parser = get_parser_for_file(target_path)
+        if not parser:
+            print(f"{YELLOW}Warning: No parser found for '{target_path}'. Trying all parsers...{RESET}")
+            for p in ALL_PARSERS:
+                kbs = p.parse(target_path)
+                if kbs:
+                    parser = p
+                    break
+        if not parser:
+            print(f"{RED}Could not parse keybindings from '{target_path}'.{RESET}")
+            return
+        kbs = parser.parse(target_path)
+        stats = db.sync_file_keybindings(tool=parser.tool_name, source_file=str(target_path), new_kbs=kbs)
+        print(f"{color_tool(parser.tool_name):<18} {DIM}{target_path}{RESET}")
+        print(f"  └─ Parsed: {len(kbs)} bindings | {GREEN}+{stats['added']}{RESET} {YELLOW}~{stats['updated']}{RESET} {RED}-{stats['deleted']}{RESET} {DIM}={stats['unchanged']}{RESET}")
+        return
+
     print(f"{BOLD}Scanning and synchronizing configuration files...{RESET}\n")
     targets = get_default_watch_targets()
 
@@ -247,7 +270,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # sync
-    subparsers.add_parser("sync", help="Scan and sync all configuration files into SQLite")
+    sync_p = subparsers.add_parser("sync", help="Scan and sync all configuration files into SQLite")
+    sync_p.add_argument("-p", "--path", help="Custom file or directory path to parse and sync")
+
 
     # search
     search_p = subparsers.add_parser("search", help="Interactive search across keybindings")

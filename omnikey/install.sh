@@ -20,13 +20,18 @@ else
     pip3 install -e . --user || pip3 install -e .
 fi
 
-# 2. Add ~/.local/bin to PATH if needed
+# 2. Add ~/.local/bin wrapper
 BIN_DIR="$HOME/.local/bin"
 mkdir -p "$BIN_DIR"
-if [ ! -f "$BIN_DIR/omnikey" ]; then
-    ln -sf "$SCRIPT_DIR/omnikey/cli.py" "$BIN_DIR/omnikey"
-    chmod +x "$BIN_DIR/omnikey"
-fi
+cat << 'EOF' > "$BIN_DIR/omnikey"
+#!/usr/bin/env bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PYTHONPATH="__OMNIKEY_PATH__:${PYTHONPATH}"
+exec python3 -m omnikey "$@"
+EOF
+sed -i '' "s|__OMNIKEY_PATH__|$SCRIPT_DIR|g" "$BIN_DIR/omnikey"
+chmod +x "$BIN_DIR/omnikey"
+
 
 # 3. Synchronize configuration files
 echo "🔍 Synchronizing system keybindings (Herdr, Neovim, Tmux, Zsh)..."

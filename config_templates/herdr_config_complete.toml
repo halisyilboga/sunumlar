@@ -1,0 +1,92 @@
+# ==============================================================================
+# Herdr Complete Recommended Configuration
+# Target: ~/.config/herdr/config.toml
+# ==============================================================================
+
+onboarding = false
+
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+[ui]
+show_agent_labels_on_pane_borders = true
+agent_panel_sort = "priority"
+
+[ui.toast]
+delivery = "off"
+
+[experimental]
+pane_history = false
+
+[keys]
+# Ana Prefix Tuşu
+prefix = "ctrl+s"
+
+# Sistem & Genel
+help = "prefix+?"
+settings = "prefix+s"
+detach = "prefix+q"
+reload_config = "prefix+shift+r"
+toggle_sidebar = "prefix+b"
+
+# Git Worktree Operasyonları
+open_worktree = "prefix+o"
+remove_worktree = "prefix+x"
+new_worktree = "prefix+shift+g"
+
+# Çalışma Alanı (Workspace) Navigasyonu
+workspace_picker = "prefix+w"
+goto = "prefix+g"
+new_workspace = "prefix+shift+n"
+rename_workspace = "prefix+shift+w"
+close_workspace = "prefix+shift+d"
+previous_workspace = "prefix+p"
+next_workspace = "prefix+n"
+switch_workspace = "prefix+1..9"
+
+# Sekme (Tab) Yönetimi
+new_tab = "prefix+c"
+rename_tab = "prefix+shift+t"
+close_tab = "prefix+shift+x"
+previous_tab = "prefix+["
+next_tab = "prefix+]"
+switch_tab = "prefix+alt+1..9"
+
+# Panel (Pane) Bölme & Boyutlandırma
+split_vertical = "prefix+v"
+split_horizontal = "prefix+minus"
+close_pane = "prefix+shift+c"
+zoom = "prefix+z"
+resize_mode = "prefix+r"
+rename_pane = "prefix+shift+p"
+edit_scrollback = "prefix+e"
+
+# Panel Odaklanma (Vim Yön Tuşları)
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+cycle_pane_next = "prefix+tab"
+cycle_pane_previous = "prefix+shift+tab"
+
+# AI Ajan (Agent) Navigasyonu
+next_agent = "prefix+ctrl+j"
+previous_agent = "prefix+ctrl+k"
+focus_agent = "prefix+alt+1..9"
+open_notification_target = "prefix+shift+o"
+
+# Özel Açılır Komutlar (Popups)
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "lazygit"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+alt+k"
+type = "popup"
+command = "omnikey search"
+width = "80%"
+height = "80%"
