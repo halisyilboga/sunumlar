@@ -9,6 +9,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 from omnikey.config import get_db_path
 from omnikey.models import AuditEntry, Keybinding
+from omnikey.semantic.tagger import SemanticTagger, normalize_text
 
 
 class Database:
@@ -67,6 +68,11 @@ class Database:
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
 
+                CREATE TABLE IF NOT EXISTS settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                );
+
                 CREATE INDEX IF NOT EXISTS idx_keybindings_tool ON keybindings(tool);
                 CREATE INDEX IF NOT EXISTS idx_keybindings_combo ON keybindings(key_combo);
                 CREATE INDEX IF NOT EXISTS idx_tags_tag ON tags(tag);
@@ -100,6 +106,41 @@ class Database:
         with self.get_connection() as c:
             cursor = c.execute(query, params)
             return cursor.lastrowid
+
+    def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        """Fetch a stored setting value."""
+        with self.get_connection() as conn:
+            row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+            return row["value"] if row else default
+
+    def set_setting(self, key: str, value: str) -> None:
+        """Store (or overwrite) a setting value."""
+        with self.get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO settings (key, value) VALUES (?, ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (key, value),
+            )
+
+    def get_active_tools(self) -> Optional[List[str]]:
+        """Return configured active tools; None means all tools are active."""
+        raw = self.get_setting("active_tools")
+        if not raw:
+            return None
+        try:
+            tools = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            return None
+        return [t for t in tools if isinstance(t, str)] or None
+
+    def set_active_tools(self, tools: Optional[List[str]]) -> None:
+        """Persist the active tools list; None or empty restores 'all tools active'."""
+        if tools:
+            self.set_setting("active_tools", json.dumps(sorted(set(tools))))
+        else:
+            self.set_setting("active_tools", "")
 
     def set_tags(self, kb_id: int, tags: List[str], conn: sqlite3.Connection) -> None:
         """Replace all tags for a keybinding."""
@@ -193,8 +234,8 @@ class Database:
 
             for actual_source, file_kbs in by_source.items():
                 existing_rows = conn.execute(
-                    "SELECT * FROM keybindings WHERE tool = ? AND source_file = ? AND is_manual = 0",
-                    (tool, actual_source),
+                    "SELECT * FROM keybindings WHERE source_file = ? AND is_manual = 0",
+                    (actual_source,),
                 ).fetchall()
 
                 existing_map: Dict[Tuple[str, str], sqlite3.Row] = {
@@ -212,6 +253,7 @@ class Database:
                         changed = (
                             row["action_raw"] != new_kb.action_raw
                             or (row["description"] or "") != (new_kb.description or "")
+                            or row["tool"] != new_kb.tool
                         )
                         existing_tags = set(self.get_tags(kb_id, conn))
                         new_tags = set(t.strip().lower() for t in new_kb.tags if t.strip())
@@ -222,10 +264,10 @@ class Database:
                             conn.execute(
                                 """
                                 UPDATE keybindings
-                                SET action_raw = ?, description = ?, last_updated = CURRENT_TIMESTAMP
+                                SET tool = ?, action_raw = ?, description = ?, last_updated = CURRENT_TIMESTAMP
                                 WHERE id = ?
                                 """,
-                                (new_kb.action_raw, new_kb.description, kb_id),
+                                (new_kb.tool, new_kb.action_raw, new_kb.description, kb_id),
                             )
                             self.set_tags(kb_id, list(new_tags), conn)
                             self.log_audit(
@@ -233,7 +275,7 @@ class Database:
                                     keybinding_id=kb_id,
                                     change_type="UPDATED",
                                     previous_value=json.dumps(old_kb.to_dict()),
-                                    details=f"Updated [{tool}] {new_kb.key_combo} in {actual_source}",
+                                    details=f"Updated [{new_kb.tool}] {new_kb.key_combo} in {actual_source}",
                                 ),
                                 conn=conn,
                             )
@@ -241,7 +283,7 @@ class Database:
                         else:
                             stats["unchanged"] += 1
                     else:
-                        cursor = conn.execute(
+                        conn.execute(
                             """
                             INSERT INTO keybindings (tool, key_combo, action_raw, description, source_file, mode, is_manual, last_updated)
                             VALUES (?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP)
@@ -259,23 +301,22 @@ class Database:
                                 new_kb.mode,
                             ),
                         )
-                        kb_id = cursor.lastrowid
-                        if not kb_id:
-                            r = conn.execute(
-                                "SELECT id FROM keybindings WHERE tool=? AND source_file=? AND key_combo=? AND mode=?",
-                                (new_kb.tool, actual_source, new_kb.key_combo, new_kb.mode),
-                            ).fetchone()
+                        r = conn.execute(
+                            "SELECT id FROM keybindings WHERE tool=? AND source_file=? AND key_combo=? AND mode=?",
+                            (new_kb.tool, actual_source, new_kb.key_combo, new_kb.mode),
+                        ).fetchone()
+                        if r:
                             kb_id = r["id"]
-                        self.set_tags(kb_id, new_kb.tags, conn)
-                        self.log_audit(
-                            AuditEntry(
-                                keybinding_id=kb_id,
-                                change_type="ADDED",
-                                details=f"Added [{tool}] {new_kb.key_combo} -> {new_kb.description or new_kb.action_raw} ({actual_source})",
-                            ),
-                            conn=conn,
-                        )
-                        stats["added"] += 1
+                            self.set_tags(kb_id, new_kb.tags, conn)
+                            self.log_audit(
+                                AuditEntry(
+                                    keybinding_id=kb_id,
+                                    change_type="ADDED",
+                                    details=f"Added [{new_kb.tool}] {new_kb.key_combo} -> {new_kb.description or new_kb.action_raw} ({actual_source})",
+                                ),
+                                conn=conn,
+                            )
+                            stats["added"] += 1
 
                 # Handle deletions for bindings no longer present in file
                 for key_tuple, row in existing_map.items():
@@ -310,11 +351,42 @@ class Database:
     def list_keybindings(
         self,
         tool: Optional[str] = None,
+        tools: Optional[List[str]] = None,
         search: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> List[Keybinding]:
-        """List keybindings filtered by tool or search string (matches combo, action, desc, or tags)."""
+        """List keybindings with bilingual semantic matching, stopword filtering, and relevancy scoring.
+
+        `tool` filters on a single tool; `tools` restricts to a set of tools
+        (applies only when `tool` is not given). Both accept `all`-style filter
+        helpers: pass `tools=[]` explicitly to mean "no restriction".
+        """
+        if tool:
+            tools = [tool] if tools is None else tools
         with self.get_connection() as conn:
+            if not search or not search.strip():
+                query = "SELECT * FROM keybindings WHERE 1=1"
+                params: List[object] = []
+                if tools:
+                    query += " AND LOWER(tool) IN ({})".format(",".join("?" for _ in tools))
+                    params.extend([t.lower() for t in tools])
+                query += " ORDER BY tool ASC, key_combo ASC"
+                if limit:
+                    query += f" LIMIT {int(limit)}"
+                rows = conn.execute(query, params).fetchall()
+                results: List[Keybinding] = []
+                for row in rows:
+                    tags = self.get_tags(row["id"], conn)
+                    results.append(self._row_to_keybinding(row, tags))
+                return results
+
+            # Process search query: get core intent tokens and synonym expansions
+            core_tokens, expanded_tokens = SemanticTagger.process_query(search)
+            search_norm = normalize_text(search).strip()
+
+            # Build query matching any core or expanded token
+            all_search_tokens = list(set(core_tokens + list(expanded_tokens)))
+
             query = """
                 SELECT DISTINCT k.*
                 FROM keybindings k
@@ -324,33 +396,85 @@ class Database:
             params: List[object] = []
 
             if tool:
-                query += " AND LOWER(k.tool) = LOWER(?)"
-                params.append(tool)
+                tools = [tool] if tools is None else tools
+            if tools:
+                query += " AND LOWER(k.tool) IN ({})".format(",".join("?" for _ in tools))
+                params.extend([t.lower() for t in tools])
 
-            if search:
-                tokens = [t.strip().lower() for t in search.split() if t.strip()]
-                for token in tokens:
-                    query += """
-                        AND (
-                            LOWER(k.key_combo) LIKE ?
-                            OR LOWER(k.action_raw) LIKE ?
-                            OR LOWER(k.description) LIKE ?
-                            OR LOWER(k.tool) LIKE ?
-                            OR LOWER(t.tag) LIKE ?
-                        )
-                    """
-                    pat = f"%{token}%"
-                    params.extend([pat, pat, pat, pat, pat])
+            token_clauses = []
+            for tok in all_search_tokens:
+                pat = f"%{tok}%"
+                token_clauses.append("""
+                    (
+                        LOWER(k.key_combo) LIKE ?
+                        OR LOWER(k.action_raw) LIKE ?
+                        OR LOWER(k.description) LIKE ?
+                        OR LOWER(k.tool) LIKE ?
+                        OR LOWER(t.tag) LIKE ?
+                    )
+                """)
+                params.extend([pat, pat, pat, pat, pat])
 
-            query += " ORDER BY k.tool ASC, k.key_combo ASC"
-            if limit:
-                query += f" LIMIT {int(limit)}"
+            if token_clauses:
+                query += " AND (" + " OR ".join(token_clauses) + ")"
 
             rows = conn.execute(query, params).fetchall()
-            results: List[Keybinding] = []
+
+            # Score and rank matched keybindings
+            scored_candidates: List[Tuple[float, Keybinding]] = []
+
             for row in rows:
                 tags = self.get_tags(row["id"], conn)
-                results.append(self._row_to_keybinding(row, tags))
+                kb = self._row_to_keybinding(row, tags)
+
+                norm_combo = normalize_text(kb.key_combo)
+                norm_desc = normalize_text(kb.description)
+                norm_action = normalize_text(kb.action_raw)
+                norm_tags = set(normalize_text(t) for t in kb.tags)
+                corpus = f"{norm_combo} {norm_action} {norm_desc} {' '.join(norm_tags)}"
+
+                score = 0.0
+
+                # 1. Exact phrase match
+                if search_norm in norm_desc or search_norm in norm_action:
+                    score += 80.0
+                if search_norm == norm_combo:
+                    score += 120.0
+                elif search_norm in norm_combo:
+                    score += 50.0
+
+                # 2. Core tokens hit ratio (bonus for matching multiple concepts, e.g. 'satır' AND 'sil')
+                core_hits = sum(1 for ct in core_tokens if ct in corpus)
+                if core_tokens:
+                    hit_ratio = core_hits / len(core_tokens)
+                    score += hit_ratio * 70.0
+                    if core_hits == len(core_tokens) and len(core_tokens) > 1:
+                        score += 50.0  # Perfect multi-token match bonus
+
+                # 3. Direct tag matches for core tokens
+                for ct in core_tokens:
+                    if ct in norm_tags:
+                        score += 25.0
+                    if ct in norm_desc:
+                        score += 20.0
+                    if ct in norm_combo:
+                        score += 30.0
+
+                # 4. Synonym matches
+                for et in expanded_tokens:
+                    if et in norm_tags:
+                        score += 15.0
+                    if et in norm_desc:
+                        score += 10.0
+
+                scored_candidates.append((score, kb))
+
+            # Sort by score DESC, then tool ASC, then key_combo ASC
+            scored_candidates.sort(key=lambda x: (-x[0], x[1].tool, x[1].key_combo))
+
+            results = [kb for _, kb in scored_candidates]
+            if limit:
+                results = results[:int(limit)]
             return results
 
     def get_audit_history(
@@ -384,10 +508,11 @@ class Database:
         all_kbs = self.list_keybindings()
         audits = self.get_audit_history(limit=500)
         return {
-            "version": "1.0",
+            "version": "1.1",
             "exported_at": datetime.now().isoformat(),
             "keybindings": [kb.to_dict() for kb in all_kbs],
             "audit_log": [a.to_dict() for a in audits],
+            "active_tools": self.get_active_tools(),
         }
 
     def import_data(self, data: dict, replace: bool = False) -> Dict[str, int]:
@@ -443,5 +568,9 @@ class Database:
                 ),
                 conn=conn,
             )
+
+        # Restore active tools preference after the transaction is committed
+        if "active_tools" in data:
+            self.set_active_tools(data["active_tools"])
 
         return stats

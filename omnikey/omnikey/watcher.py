@@ -1,11 +1,10 @@
-"""Filesystem watcher daemon for real-time config changes."""
-
+import json
 import time
 from pathlib import Path
 from threading import Timer
 from typing import Any, Dict, List, Optional
 
-from omnikey.config import get_default_watch_targets
+from omnikey.config import get_default_watch_targets, get_export_path
 from omnikey.db import Database
 from omnikey.parsers import get_parser_for_file
 from omnikey.semantic.conflict import ConflictDetector
@@ -65,6 +64,16 @@ class ConfigChangeHandler(FileSystemEventHandler):
                     f"[OmniKey Watcher] Synced {parser.tool_name}: "
                     f"+{stats['added']} ~{stats['updated']} -{stats['deleted']} ={stats['unchanged']}"
                 )
+
+                # Auto-export snapshot on config modification
+                try:
+                    export_path = get_export_path()
+                    data = self.db.export_data()
+                    with open(export_path, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=2, ensure_ascii=False)
+                    print(f"[OmniKey Watcher] Auto-exported backup to: {export_path}")
+                except Exception as ex:
+                    print(f"[OmniKey Watcher] Export failed: {ex}")
 
                 # Check for conflicts
                 all_kbs = self.db.list_keybindings()

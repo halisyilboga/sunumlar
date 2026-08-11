@@ -103,6 +103,45 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(len(res_dosya), 1)
         self.assertEqual(res_dosya[0].tool, "neovim")
 
+    def test_settings_roundtrip(self):
+        self.assertIsNone(self.db.get_setting("active_tools"))
+        self.db.set_active_tools(["herdr", "tmux"])
+        self.assertEqual(self.db.get_active_tools(), ["herdr", "tmux"])
+        self.db.set_active_tools(None)
+        self.assertIsNone(self.db.get_active_tools())
+        self.db.set_active_tools([])
+        self.assertIsNone(self.db.get_active_tools())
+
+    def test_active_tools_filter(self):
+        kb1 = Keybinding(tool="herdr", key_combo="prefix+w", action_raw="workspace_picker", description="WS", source_file="a")
+        kb2 = Keybinding(tool="neovim", key_combo="dd", action_raw="delete_line", description="Satir sil", source_file="b")
+        self.db.sync_file_keybindings("herdr", "a", [kb1])
+        self.db.sync_file_keybindings("neovim", "b", [kb2])
+
+        # tools restriction applies
+        self.db.set_active_tools(["herdr"])
+        active = self.db.get_active_tools()
+        res = self.db.list_keybindings(tools=active)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].tool, "herdr")
+
+        # search + tools restriction combined
+        res2 = self.db.list_keybindings(tools=["herdr"], search="satir")
+        self.assertEqual(len(res2), 0)
+
+        # tools=[] means no restriction
+        res3 = self.db.list_keybindings(tools=[])
+        self.assertEqual(len(res3), 2)
+
+    def test_export_import_preserves_active_tools(self):
+        self.db.set_active_tools(["herdr"])
+        data = self.db.export_data()
+        self.assertEqual(data["active_tools"], ["herdr"])
+
+        other = Database(db_path=Path(self.temp_dir.name) / "other.db")
+        other.import_data(data)
+        self.assertEqual(other.get_active_tools(), ["herdr"])
+
 
 if __name__ == "__main__":
     unittest.main()

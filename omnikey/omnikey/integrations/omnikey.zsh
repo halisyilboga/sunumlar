@@ -2,11 +2,19 @@
 # OmniKey Zsh Integration & Global Keybinding Widget
 # Source this file in ~/.zshrc: source path/to/omnikey.zsh
 
-# Interactive search function
+# Ensure ~/.local/bin is in PATH for direct 'omnikey' CLI calls
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Interactive search function triggered by widget
 omnikey-widget() {
-  local selected
-  # Run omnikey search via fzf
-  python3 -m omnikey search
+  # Run omnikey search via fzf popup/terminal
+  if command -v omnikey >/dev/null 2>&1; then
+    omnikey search
+  else
+    python3 -m omnikey search
+  fi
   zle reset-prompt 2>/dev/null || true
 }
 
@@ -19,9 +27,16 @@ if [[ -n "$ZSH_VERSION" ]]; then
 fi
 
 # Convenient CLI aliases
-alias ok="python3 -m omnikey"
-alias oks="python3 -m omnikey search"
-alias okl="python3 -m omnikey list"
-alias okc="python3 -m omnikey conflicts"
-alias okh="python3 -m omnikey history"
-alias okw="python3 -m omnikey watch"
+alias ok="omnikey"
+alias oks="omnikey search"
+alias okl="omnikey list"
+alias okc="omnikey conflicts"
+alias okh="omnikey history"
+alias okw="omnikey watch"
+alias oke="omnikey export"
+alias oksy="omnikey sync"
+
+# Auto-sync & export helper function
+omnikey_auto_export() {
+  (python3 -m omnikey export >/dev/null 2>&1 &)
+}

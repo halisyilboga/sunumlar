@@ -51,6 +51,7 @@ def get_default_watch_targets() -> Dict[str, List[Path]]:
         "neovim": [
             home / ".config" / "nvim" / "init.lua",
             home / ".config" / "nvim" / "lua",
+            home / ".local" / "share" / "nvim" / "lazy" / "NvChad" / "lua",
         ],
         "zsh": [
             home / ".zshrc",

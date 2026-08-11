@@ -50,10 +50,15 @@ def copy_to_clipboard(text: str) -> bool:
     return False
 
 
-def run_fzf_search(db: Database, query: Optional[str] = None, tool: Optional[str] = None) -> None:
+def run_fzf_search(
+    db: Database,
+    query: Optional[str] = None,
+    tool: Optional[str] = None,
+    tools: Optional[List[str]] = None,
+) -> None:
     """Run interactive fzf search over database keybindings."""
     fzf_bin = find_fzf_binary()
-    kbs = db.list_keybindings(tool=tool)
+    kbs = db.list_keybindings(tool=tool, tools=tools)
 
     if not kbs:
         print(f"{YELLOW}No keybindings found in database. Run 'omnikey sync' to scan your files.{RESET}")

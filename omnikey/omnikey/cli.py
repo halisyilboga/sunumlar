@@ -17,6 +17,8 @@ from omnikey.config import (
 from omnikey.db import Database
 from omnikey.models import Keybinding
 from omnikey.parsers import ALL_PARSERS, get_parser_for_file
+from omnikey.parsers.neovim import NeovimParser
+from omnikey.parsers.shell_defaults import ShellDefaultsParser
 from omnikey.semantic.conflict import ConflictDetector
 from omnikey.semantic.tagger import SemanticTagger
 from omnikey.ui.formatter import (
@@ -35,6 +37,64 @@ from omnikey.ui.formatter import (
 )
 from omnikey.ui.fzf_search import find_fzf_binary, run_fzf_search
 from omnikey.watcher import ConfigWatcher
+
+
+def resolve_tool_filter(args, db: Database) -> Optional[List[str]]:
+    """Return the effective tool restriction for search/list/conflicts.
+
+    Explicit `-t/--tool` wins; otherwise the persisted active tools apply;
+    `--all-tools` disables the restriction entirely.
+    """
+    if getattr(args, "all_tools", False):
+        return None
+    if getattr(args, "tool", None):
+        return [args.tool]
+    return db.get_active_tools()
+
+
+def cmd_tools(args, db: Database) -> None:
+    """Manage active tools (which tools appear in results by default)."""
+    known_tools = sorted(
+        set(["herdr", "tmux", "neovim", "zsh", "builtin", "custom"])
+        | {kb.tool for kb in db.list_keybindings()}
+    )
+    action = getattr(args, "tools_action", None)
+
+    if action == "enable":
+        for tool in args.tools:
+            if tool not in known_tools:
+                print(f"{YELLOW}Warning: '{tool}' is not a known tool.{RESET}")
+        current = db.get_active_tools() or known_tools
+        db.set_active_tools(sorted(set(current) | set(args.tools)))
+        print(f"{GREEN}✓ Active tools:{RESET} {', '.join(db.get_active_tools() or known_tools)}")
+        return
+
+    if action == "disable":
+        for tool in args.tools:
+            if tool not in known_tools:
+                print(f"{YELLOW}Warning: '{tool}' is not a known tool.{RESET}")
+        current = db.get_active_tools() or known_tools
+        db.set_active_tools([t for t in current if t not in args.tools])
+        active = db.get_active_tools()
+        print(f"{GREEN}✓ Active tools:{RESET} {', '.join(active) if active else '(none — use --all-tools to see everything)'}")
+        return
+
+    if action == "reset":
+        db.set_active_tools(None)
+        print(f"{GREEN}✓ Reset: all tools are active again.{RESET}")
+        return
+
+    # Default: show status table
+    active_set = set(db.get_active_tools() or known_tools)
+    print(f"{BOLD}Tool Status (active tools are shown in results by default):{RESET}\n")
+    for tool in known_tools:
+        count = len(db.list_keybindings(tool=tool))
+        mark = f"{GREEN}● active{RESET}" if tool in active_set else f"{DIM}○ inactive{RESET}"
+        print(f"  {mark:<14} {color_tool(tool):<10} {DIM}{count} bindings{RESET}")
+    print(
+        f"\nUsage: {BOLD}omnikey tools enable <tool...>{RESET} | "
+        f"{BOLD}disable <tool...>{RESET} | {BOLD}reset{RESET}"
+    )
 
 
 def cmd_sync(args, db: Database) -> None:
@@ -98,6 +158,44 @@ def cmd_sync(args, db: Database) -> None:
                 f"{DIM}={stats['unchanged']}{RESET}"
             )
 
+    # Always sync built-in standard Shell & Editor keybindings
+    builtin_kbs = ShellDefaultsParser.get_all_builtins()
+    b_stats = db.sync_file_keybindings(
+        tool="builtin",
+        source_file="builtin://standards",
+        new_kbs=builtin_kbs,
+    )
+    for k in total_stats:
+        total_stats[k] += b_stats[k]
+    found_files += 1
+    print(
+        f"{color_tool('builtin'):<18} {DIM}builtin://standards (Readline, Zsh, Vim){RESET}\n"
+        f"  └─ Parsed: {len(builtin_kbs)} bindings | "
+        f"{GREEN}+{b_stats['added']}{RESET} "
+        f"{YELLOW}~{b_stats['updated']}{RESET} "
+        f"{RED}-{b_stats['deleted']}{RESET} "
+        f"{DIM}={b_stats['unchanged']}{RESET}"
+    )
+
+    # Always sync NvChad standard baseline keybindings
+    nvchad_kbs = NeovimParser.get_nvchad_builtins()
+    nv_stats = db.sync_file_keybindings(
+        tool="neovim",
+        source_file="builtin://nvchad",
+        new_kbs=nvchad_kbs,
+    )
+    for k in total_stats:
+        total_stats[k] += nv_stats[k]
+    found_files += 1
+    print(
+        f"{color_tool('neovim'):<18} {DIM}builtin://nvchad (Telescope, LSP, Buffers, Term){RESET}\n"
+        f"  └─ Parsed: {len(nvchad_kbs)} bindings | "
+        f"{GREEN}+{nv_stats['added']}{RESET} "
+        f"{YELLOW}~{nv_stats['updated']}{RESET} "
+        f"{RED}-{nv_stats['deleted']}{RESET} "
+        f"{DIM}={nv_stats['unchanged']}{RESET}"
+    )
+
     print("\n" + "=" * 55)
     print(
         f"{BOLD}Sync Complete!{RESET} ({found_files} files scanned)\n"
@@ -106,6 +204,16 @@ def cmd_sync(args, db: Database) -> None:
         f"{RED}{total_stats['deleted']} removed{RESET}, "
         f"{DIM}{total_stats['unchanged']} unchanged{RESET}"
     )
+
+    # Auto-export snapshot for git backups and disaster recovery
+    export_path = get_export_path()
+    try:
+        data = db.export_data()
+        with open(export_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        print(f"{GREEN}✓ Auto-exported backup snapshot ({len(data['keybindings'])} bindings) to:{RESET} {export_path}")
+    except Exception as e:
+        print(f"{YELLOW}Notice: auto-export failed: {e}{RESET}")
 
     # Check conflicts after sync
     all_kbs = db.list_keybindings()
@@ -116,8 +224,9 @@ def cmd_sync(args, db: Database) -> None:
 
 def cmd_search(args, db: Database) -> None:
     """Interactive FZF search or text search."""
+    tools = resolve_tool_filter(args, db)
     if args.no_fzf:
-        kbs = db.list_keybindings(tool=args.tool, search=args.query)
+        kbs = db.list_keybindings(tools=tools, search=args.query)
         if not kbs:
             print(f"{YELLOW}No keybindings found.{RESET}")
             return
@@ -125,12 +234,13 @@ def cmd_search(args, db: Database) -> None:
         for kb in kbs:
             print(format_keybinding_row(kb))
     else:
-        run_fzf_search(db, query=args.query, tool=args.tool)
+        run_fzf_search(db, query=args.query, tools=tools)
 
 
 def cmd_list(args, db: Database) -> None:
     """List keybindings in table or JSON format."""
-    kbs = db.list_keybindings(tool=args.tool, search=args.search, limit=args.limit)
+    tools = resolve_tool_filter(args, db)
+    kbs = db.list_keybindings(tools=tools, search=args.search, limit=args.limit)
     if args.json:
         print(json.dumps([kb.to_dict() for kb in kbs], indent=2, ensure_ascii=False))
         return
@@ -147,7 +257,7 @@ def cmd_list(args, db: Database) -> None:
 
 def cmd_conflicts(args, db: Database) -> None:
     """Analyze and display keybinding conflicts."""
-    all_kbs = db.list_keybindings(tool=args.tool)
+    all_kbs = db.list_keybindings(tools=resolve_tool_filter(args, db))
     conflicts = ConflictDetector.detect_conflicts(all_kbs)
     print(format_conflicts(conflicts))
 
@@ -278,11 +388,13 @@ def build_parser() -> argparse.ArgumentParser:
     search_p = subparsers.add_parser("search", help="Interactive search across keybindings")
     search_p.add_argument("query", nargs="?", default="", help="Initial search query")
     search_p.add_argument("-t", "--tool", help="Filter by tool (herdr, tmux, neovim, zsh)")
+    search_p.add_argument("--all-tools", action="store_true", help="Include inactive tools in results")
     search_p.add_argument("--no-fzf", action="store_true", help="Disable fzf and use text output")
 
     # list
     list_p = subparsers.add_parser("list", help="List indexed keybindings")
     list_p.add_argument("-t", "--tool", help="Filter by tool")
+    list_p.add_argument("--all-tools", action="store_true", help="Include inactive tools in results")
     list_p.add_argument("-s", "--search", help="Search filter")
     list_p.add_argument("-l", "--limit", type=int, help="Limit number of results")
     list_p.add_argument("--json", action="store_true", help="Output as JSON")
@@ -290,6 +402,17 @@ def build_parser() -> argparse.ArgumentParser:
     # conflicts
     conf_p = subparsers.add_parser("conflicts", help="Detect keybinding collisions across tools")
     conf_p.add_argument("-t", "--tool", help="Filter by tool")
+    conf_p.add_argument("--all-tools", action="store_true", help="Include inactive tools in results")
+
+    # tools
+    tools_p = subparsers.add_parser("tools", help="Manage active tools shown in results by default")
+    tools_sub = tools_p.add_subparsers(dest="tools_action", help="Tools action")
+    tools_sub.add_parser("list", help="Show tool status")
+    enable_p = tools_sub.add_parser("enable", help="Activate one or more tools")
+    enable_p.add_argument("tools", nargs="+", help="Tool names to activate (e.g. herdr tmux)")
+    disable_p = tools_sub.add_parser("disable", help="Deactivate one or more tools")
+    disable_p.add_argument("tools", nargs="+", help="Tool names to deactivate (e.g. neovim)")
+    tools_sub.add_parser("reset", help="Reset: make all tools active again")
 
     # history
     hist_p = subparsers.add_parser("history", help="Show audit log and changes history")
@@ -331,9 +454,9 @@ def main(args: Optional[List[str]] = None) -> None:
     parsed_args = parser.parse_args(args)
 
     if not parsed_args.command:
-        # Default action when no command given: search
+        # Default action when no command given: search (only active tools)
         db = Database()
-        run_fzf_search(db)
+        run_fzf_search(db, tools=db.get_active_tools())
         return
 
     db = Database()
@@ -350,6 +473,7 @@ def main(args: Optional[List[str]] = None) -> None:
         "export": cmd_export,
         "import": cmd_import,
         "doctor": cmd_doctor,
+        "tools": cmd_tools,
     }
 
     handler = command_handlers.get(parsed_args.command)
