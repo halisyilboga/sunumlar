@@ -17,11 +17,14 @@ MAGENTA = "\033[35m"
 BLUE = "\033[34m"
 
 TOOL_COLORS = {
+    "git": RED,
     "herdr": CYAN,
     "tmux": GREEN,
     "neovim": MAGENTA,
     "nvim": MAGENTA,
     "zsh": YELLOW,
+    "linux": BLUE,
+    "cli": BLUE,
     "custom": BLUE,
 }
 
@@ -41,16 +44,34 @@ def format_keybinding_row(kb: Keybinding) -> str:
 
 
 def format_keybinding_detail(kb: Keybinding) -> str:
-    """Format a detailed view of a keybinding."""
+    """Format a detailed preview card of a keybinding."""
+    tool_badge = color_tool(kb.tool)
+    is_builtin = kb.source_file.startswith("builtin://")
+    source_label = f"{CYAN}[Built-in Standard]{RESET}" if is_builtin else f"{GREEN}[User Config File]{RESET}"
+
+    # Clean bilingual breakdown
+    desc = kb.description or kb.action_raw
+    if " / " in desc:
+        tr_part, en_part = desc.split(" / ", 1)
+        desc_formatted = f"\n│  🇹🇷 {BOLD}{tr_part.strip()}{RESET}\n│  🇬🇧 {DIM}{en_part.strip()}{RESET}"
+    else:
+        desc_formatted = f" {BOLD}{desc}{RESET}"
+
+    tags_str = ", ".join(f"#{t}" for t in kb.tags[:12]) if kb.tags else "None"
+
     lines = [
-        f"{BOLD}Tool:{RESET}         {color_tool(kb.tool)}",
-        f"{BOLD}Key Combo:{RESET}    {YELLOW}{kb.key_combo}{RESET}",
-        f"{BOLD}Action Raw:{RESET}   {CYAN}{kb.action_raw}{RESET}",
-        f"{BOLD}Description:{RESET}  {kb.description}",
-        f"{BOLD}Mode:{RESET}         {kb.mode}",
-        f"{BOLD}Source File:{RESET}  {DIM}{kb.source_file}{RESET}",
-        f"{BOLD}Tags:{RESET}         {', '.join(kb.tags)}",
-        f"{BOLD}Last Updated:{RESET} {kb.last_updated}",
+        f"┌─────────────────────────────────────────────────────────────",
+        f"│ {tool_badge}  {BOLD}{YELLOW}{kb.key_combo}{RESET}  {DIM}(mode: {kb.mode}){RESET}",
+        f"├─────────────────────────────────────────────────────────────",
+        f"│ {BOLD}Action / Command:{RESET} {CYAN}{kb.action_raw}{RESET}",
+        f"│ {BOLD}Description:{RESET}{desc_formatted}",
+        f"│",
+        f"│ {BOLD}Source:{RESET} {source_label}",
+        f"│   {DIM}{kb.source_file}{RESET}",
+        f"│",
+        f"│ {BOLD}Semantic Tags:{RESET}",
+        f"│   {DIM}{tags_str}{RESET}",
+        f"└─────────────────────────────────────────────────────────────",
     ]
     return "\n".join(lines)
 

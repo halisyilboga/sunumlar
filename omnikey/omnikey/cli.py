@@ -17,8 +17,11 @@ from omnikey.config import (
 from omnikey.db import Database
 from omnikey.models import Keybinding
 from omnikey.parsers import ALL_PARSERS, get_parser_for_file
+from omnikey.parsers.herdr import HerdrParser
+from omnikey.parsers.linux_commands import LinuxCommandsParser
 from omnikey.parsers.neovim import NeovimParser
 from omnikey.parsers.shell_defaults import ShellDefaultsParser
+from omnikey.parsers.tmux import TmuxParser
 from omnikey.semantic.conflict import ConflictDetector
 from omnikey.semantic.tagger import SemanticTagger
 from omnikey.ui.formatter import (
@@ -158,6 +161,44 @@ def cmd_sync(args, db: Database) -> None:
                 f"{DIM}={stats['unchanged']}{RESET}"
             )
 
+    # Always sync Herdr standard CLI commands and default keybindings
+    herdr_kbs = HerdrParser.get_all_herdr_defaults()
+    h_stats = db.sync_file_keybindings(
+        tool="herdr",
+        source_file="builtin://herdr_standards",
+        new_kbs=herdr_kbs,
+    )
+    for k in total_stats:
+        total_stats[k] += h_stats[k]
+    found_files += 1
+    print(
+        f"{color_tool('herdr'):<18} {DIM}builtin://herdr_standards (CLI & Defaults){RESET}\n"
+        f"  └─ Parsed: {len(herdr_kbs)} bindings | "
+        f"{GREEN}+{h_stats['added']}{RESET} "
+        f"{YELLOW}~{h_stats['updated']}{RESET} "
+        f"{RED}-{h_stats['deleted']}{RESET} "
+        f"{DIM}={h_stats['unchanged']}{RESET}"
+    )
+
+    # Always sync Tmux standard CLI commands and default keybindings
+    tmux_kbs = TmuxParser.get_all_tmux_defaults()
+    t_stats = db.sync_file_keybindings(
+        tool="tmux",
+        source_file="builtin://tmux_standards",
+        new_kbs=tmux_kbs,
+    )
+    for k in total_stats:
+        total_stats[k] += t_stats[k]
+    found_files += 1
+    print(
+        f"{color_tool('tmux'):<18} {DIM}builtin://tmux_standards (CLI & Defaults){RESET}\n"
+        f"  └─ Parsed: {len(tmux_kbs)} bindings | "
+        f"{GREEN}+{t_stats['added']}{RESET} "
+        f"{YELLOW}~{t_stats['updated']}{RESET} "
+        f"{RED}-{t_stats['deleted']}{RESET} "
+        f"{DIM}={t_stats['unchanged']}{RESET}"
+    )
+
     # Always sync built-in standard Shell & Editor keybindings
     builtin_kbs = ShellDefaultsParser.get_all_builtins()
     b_stats = db.sync_file_keybindings(
@@ -177,18 +218,37 @@ def cmd_sync(args, db: Database) -> None:
         f"{DIM}={b_stats['unchanged']}{RESET}"
     )
 
-    # Always sync NvChad standard baseline keybindings
+    # Always sync Linux/Unix terminal recipes and commands
+    linux_kbs = LinuxCommandsParser.get_all_linux_commands()
+    l_stats = db.sync_file_keybindings(
+        tool="linux",
+        source_file="builtin://linux_recipes",
+        new_kbs=linux_kbs,
+    )
+    for k in total_stats:
+        total_stats[k] += l_stats[k]
+    found_files += 1
+    print(
+        f"{color_tool('linux'):<18} {DIM}builtin://linux_recipes (Find, Ports, Tar, Git){RESET}\n"
+        f"  └─ Parsed: {len(linux_kbs)} commands | "
+        f"{GREEN}+{l_stats['added']}{RESET} "
+        f"{YELLOW}~{l_stats['updated']}{RESET} "
+        f"{RED}-{l_stats['deleted']}{RESET} "
+        f"{DIM}={l_stats['unchanged']}{RESET}"
+    )
+
+    # Always sync NvChad ecosystem standards (Telescope, LSP, Gitsigns, Mason, Lazy, Treesitter, Minty)
     nvchad_kbs = NeovimParser.get_nvchad_builtins()
     nv_stats = db.sync_file_keybindings(
         tool="neovim",
-        source_file="builtin://nvchad",
+        source_file="builtin://nvchad_standards",
         new_kbs=nvchad_kbs,
     )
     for k in total_stats:
         total_stats[k] += nv_stats[k]
     found_files += 1
     print(
-        f"{color_tool('neovim'):<18} {DIM}builtin://nvchad (Telescope, LSP, Buffers, Term){RESET}\n"
+        f"{color_tool('neovim'):<18} {DIM}builtin://nvchad_standards (Telescope, LSP, Git, Mason, Lazy){RESET}\n"
         f"  └─ Parsed: {len(nvchad_kbs)} bindings | "
         f"{GREEN}+{nv_stats['added']}{RESET} "
         f"{YELLOW}~{nv_stats['updated']}{RESET} "
@@ -223,10 +283,28 @@ def cmd_sync(args, db: Database) -> None:
 
 
 def cmd_search(args, db: Database) -> None:
-    """Interactive FZF search or text search."""
-    tools = resolve_tool_filter(args, db)
+    """Interactive FZF search or text search with @tool tag extraction."""
+    raw_query = args.query or ""
+    tool_filter = args.tool
+    search_query = raw_query
+    fzf_query = raw_query
+
+    # Auto-extract @tool from query (e.g. "@linux port", "@nvim buffer", or "@herdr")
+    if raw_query.startswith("@"):
+        parts = raw_query.split(None, 1)
+        tag = parts[0][1:].lower()
+        if tag in ("nvim", "neovim"):
+            tool_filter = "neovim"
+        elif tag in ("linux", "cli"):
+            tool_filter = "linux"
+        elif tag in ("herdr", "tmux", "zsh", "builtin"):
+            tool_filter = tag
+        search_query = parts[1] if len(parts) > 1 else ""
+        fzf_query = f"'@{tag} {search_query}".strip() if search_query else f"'@{tag} "
+
+    tools = [tool_filter] if tool_filter else resolve_tool_filter(args, db)
     if args.no_fzf:
-        kbs = db.list_keybindings(tools=tools, search=args.query)
+        kbs = db.list_keybindings(tools=tools, search=search_query)
         if not kbs:
             print(f"{YELLOW}No keybindings found.{RESET}")
             return
@@ -234,7 +312,7 @@ def cmd_search(args, db: Database) -> None:
         for kb in kbs:
             print(format_keybinding_row(kb))
     else:
-        run_fzf_search(db, query=args.query, tools=tools)
+        run_fzf_search(db, query=fzf_query, tool=tool_filter, tools=tools)
 
 
 def cmd_list(args, db: Database) -> None:
@@ -343,6 +421,15 @@ def cmd_import(args, db: Database) -> None:
     print(f"{GREEN}✓ Disaster Recovery Import Complete:{RESET} {stats['imported']} keybindings imported.")
 
 
+def cmd_show(args, db: Database) -> None:
+    """Display formatted preview card for a keybinding by ID (used by FZF preview and CLI)."""
+    kb = db.get_keybinding(args.id)
+    if not kb:
+        print(f"{RED}Keybinding ID {args.id} not found.{RESET}")
+        return
+    print(format_keybinding_detail(kb))
+
+
 def cmd_doctor(args, db: Database) -> None:
     """Perform health and diagnostics checks on OmniKey."""
     print(f"{BOLD}OmniKey System Doctor v{__version__}{RESET}\n")
@@ -443,6 +530,10 @@ def build_parser() -> argparse.ArgumentParser:
     imp_p.add_argument("file", help="Path to JSON export file")
     imp_p.add_argument("--replace", action="store_true", help="Replace existing database contents")
 
+    # show
+    show_p = subparsers.add_parser("show", help="Display details for a keybinding ID (used by FZF preview)")
+    show_p.add_argument("id", type=int, help="Keybinding ID")
+
     # doctor
     subparsers.add_parser("doctor", help="Run health check and diagnostics")
 
@@ -472,6 +563,7 @@ def main(args: Optional[List[str]] = None) -> None:
         "watch": cmd_watch,
         "export": cmd_export,
         "import": cmd_import,
+        "show": cmd_show,
         "doctor": cmd_doctor,
         "tools": cmd_tools,
     }

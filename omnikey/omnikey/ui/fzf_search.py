@@ -1,14 +1,16 @@
-"""Interactive FZF search integration with live preview."""
+"""Interactive FZF search integration with live preview card, word-boundary scoring, and tool filters."""
 
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import List, Optional
 
 from omnikey.db import Database
 from omnikey.models import Keybinding
 from omnikey.ui.formatter import (
+    BLUE,
     BOLD,
     CYAN,
     DIM,
@@ -56,9 +58,19 @@ def run_fzf_search(
     tool: Optional[str] = None,
     tools: Optional[List[str]] = None,
 ) -> None:
-    """Run interactive fzf search over database keybindings."""
+    """Run interactive fzf search with live preview card, word boundary matching, and quick filters."""
     fzf_bin = find_fzf_binary()
-    kbs = db.list_keybindings(tool=tool, tools=tools)
+
+    # Pre-sort with NLP relevance engine if query provided, else list all
+    if query and query.strip() and not query.strip().startswith("@") and not query.strip().startswith("'"):
+        kbs = db.list_keybindings(tool=tool, tools=tools, search=query)
+        all_kbs = db.list_keybindings(tool=tool, tools=tools)
+        seen_ids = {k.id for k in kbs}
+        for k in all_kbs:
+            if k.id not in seen_ids:
+                kbs.append(k)
+    else:
+        kbs = db.list_keybindings(tool=tool, tools=tools)
 
     if not kbs:
         print(f"{YELLOW}No keybindings found in database. Run 'omnikey sync' to scan your files.{RESET}")
@@ -66,9 +78,9 @@ def run_fzf_search(
 
     if not fzf_bin:
         # Fallback to plain text search
-        filtered = db.list_keybindings(tool=tool, search=query)
+        filtered = db.list_keybindings(tool=tool, tools=tools, search=query)
         if not filtered:
-            print(f"{YELLOW}No matching keybindings for: '{query}'{RESET}")
+            print(f"{YELLOW}No matching keybindings or commands for: '{query}'{RESET}")
             return
         print(f"\n{BOLD}OmniKey Search Results ({len(filtered)} items):{RESET}")
         for kb in filtered:
@@ -76,30 +88,70 @@ def run_fzf_search(
         return
 
     # Build FZF formatted list
-    # Format: ID \t [TOOL] \t KEY_COMBO \t DESCRIPTION \t TAGS
+    # Format: 1: ID \t 2: [TOOL] @tool \t 3: KEY_COMBO \t 4: CLEAN_DESC \t 5: TAGS
     lines: List[str] = []
     kb_map = {}
+
     for kb in kbs:
         kb_id = str(kb.id)
         kb_map[kb_id] = kb
-        tool_str = f"[{kb.tool.upper()}]"
-        tags_preview = f"({', '.join(kb.tags[:6])})" if kb.tags else ""
-        line = f"{kb_id}\t{tool_str:<10}\t{kb.key_combo:<16}\t{kb.description or kb.action_raw}\t{tags_preview}"
+        tool_name = kb.tool.lower()
+
+        # Tool badge with color and @tag alias for instant filtering
+        badge_colored = color_tool(tool_name)
+        tool_tag = f"@{tool_name}"
+        if tool_name in ("neovim", "nvim"):
+            tool_tag += " @nvim"
+        elif tool_name in ("linux", "cli"):
+            tool_tag += " @cli"
+
+        # Clean bilingual breakdown
+        desc = kb.description or kb.action_raw
+        if " / " in desc:
+            tr_part, en_part = desc.split(" / ", 1)
+            clean_desc = f"{tr_part.strip()} {DIM}│{RESET} {en_part.strip()}"
+        else:
+            clean_desc = desc
+
+        tags_str = " ".join(f"#{t}" for t in kb.tags) if kb.tags else ""
+        line = f"{kb_id}\t{badge_colored:<18} {DIM}{tool_tag:<10}{RESET}\t{BOLD}{YELLOW}{kb.key_combo:<24}{RESET}\t{clean_desc}\t{DIM}{tags_str}{RESET}"
         lines.append(line)
 
     fzf_input = "\n".join(lines)
 
-    # Temporary script or command for fzf preview
+    header_text = (
+        "OmniKey Universal Cheat & Shortcut Hub\n"
+        "⚡ Filters: Ctrl+A (All) | Ctrl+H (Herdr) | Ctrl+N (Nvim) | Ctrl+L (Linux) | Ctrl+T (Tmux) | Ctrl+Z (Zsh)\n"
+        "🏷️  Exact Tags: '@herdr | '@nvim | '@linux | '@tmux | '@zsh (Press Ctrl+H/N/L/T/Z for 1-click filter)\n"
+        "⏎ Action: Enter to copy key/command to clipboard | Esc: Exit"
+    )
+
+    # Preview command using omnikey show
+    py_exec = sys.executable or "python3"
+    preview_cmd = f"{py_exec} -m omnikey show {{1}}"
+
     fzf_cmd = [
         fzf_bin,
         "--ansi",
         "--delimiter=\t",
-        "--with-nth=2..5",
+        "--with-nth=2..",  # Present from tool badge onwards, preserving all columns
+        "--tiebreak=begin,length,chunk",  # Rank exact word starts highest
         "--height=85%",
         "--layout=reverse",
-        "--border",
-        "--header=OmniKey Keybinding Search (Enter: Copy Combo, Esc: Exit)",
-        "--preview-window=right:45%:wrap",
+        "--border=rounded",
+        f"--header={header_text}",
+        "--prompt=🔍 Search > ",
+        "--pointer=▶",
+        "--marker=✓",
+        "--preview-window=right:48%:wrap:border-left",
+        f"--preview={preview_cmd}",
+        # Interactive Tool switching keybindings (Exact matching with ')
+        "--bind=ctrl-a:change-query()",
+        "--bind=ctrl-h:change-query('@herdr )",
+        "--bind=ctrl-n:change-query('@nvim )",
+        "--bind=ctrl-l:change-query('@linux )",
+        "--bind=ctrl-t:change-query('@tmux )",
+        "--bind=ctrl-z:change-query('@zsh )",
     ]
 
     if query:
@@ -121,12 +173,13 @@ def run_fzf_search(
             selected_kb = kb_map.get(selected_id) or db.get_keybinding(int(selected_id))
 
             if selected_kb:
-                print("\n" + "=" * 55)
+                print("\n" + "=" * 62)
                 print(format_keybinding_detail(selected_kb))
-                print("=" * 55)
+                print("=" * 62)
 
                 copied = copy_to_clipboard(selected_kb.key_combo)
                 if copied:
-                    print(f"{GREEN}✓ Copied '{selected_kb.key_combo}' to clipboard!{RESET}\n")
+                    label = "command" if selected_kb.tool == "linux" else "keybinding"
+                    print(f"{GREEN}✓ Copied {label} '{selected_kb.key_combo}' to clipboard!{RESET}\n")
     except Exception as e:
         print(f"{RED}Error running fzf: {e}{RESET}")

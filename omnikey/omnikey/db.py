@@ -370,14 +370,21 @@ class Database:
                 if tools:
                     query += " AND LOWER(tool) IN ({})".format(",".join("?" for _ in tools))
                     params.extend([t.lower() for t in tools])
-                query += " ORDER BY tool ASC, key_combo ASC"
-                if limit:
-                    query += f" LIMIT {int(limit)}"
+                # Order user configs before builtin
+                query += " ORDER BY CASE WHEN source_file LIKE 'builtin://%' THEN 1 ELSE 0 END ASC, tool ASC, key_combo ASC"
                 rows = conn.execute(query, params).fetchall()
+                seen_combos = set()
                 results: List[Keybinding] = []
                 for row in rows:
                     tags = self.get_tags(row["id"], conn)
-                    results.append(self._row_to_keybinding(row, tags))
+                    kb = self._row_to_keybinding(row, tags)
+                    key = (kb.tool.lower(), kb.key_combo.lower(), kb.action_raw.lower(), kb.mode.lower())
+                    if key in seen_combos:
+                        continue
+                    seen_combos.add(key)
+                    results.append(kb)
+                if limit:
+                    results = results[:int(limit)]
                 return results
 
             # Process search query: get core intent tokens and synonym expansions
@@ -469,10 +476,27 @@ class Database:
 
                 scored_candidates.append((score, kb))
 
-            # Sort by score DESC, then tool ASC, then key_combo ASC
-            scored_candidates.sort(key=lambda x: (-x[0], x[1].tool, x[1].key_combo))
+            # Sort by score DESC, then user config before builtin, then tool ASC, then key_combo ASC
+            scored_candidates.sort(
+                key=lambda x: (
+                    -x[0],
+                    1 if x[1].source_file.startswith("builtin://") else 0,
+                    x[1].tool,
+                    x[1].key_combo,
+                )
+            )
 
-            results = [kb for _, kb in scored_candidates]
+            # Deduplicate entries with same tool, combo, action (prefer non-builtin user config)
+            seen_combos = set()
+            deduped_results: List[Keybinding] = []
+            for _, kb in scored_candidates:
+                key = (kb.tool.lower(), kb.key_combo.lower(), kb.action_raw.lower(), kb.mode.lower())
+                if key in seen_combos:
+                    continue
+                seen_combos.add(key)
+                deduped_results.append(kb)
+
+            results = deduped_results
             if limit:
                 results = results[:int(limit)]
             return results

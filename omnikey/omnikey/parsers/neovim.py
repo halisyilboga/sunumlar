@@ -27,8 +27,8 @@ NVCHAD_BUILTIN_BINDINGS = [
     ("n", "<C-c>", "<cmd>%y+<CR>", "Tüm dosyayı kopyala / Copy whole file to clipboard"),
     ("n", "<leader>n", "<cmd>set nu!<CR>", "Satır numaralarını aç/kapat / Toggle line numbers"),
     ("n", "<leader>rn", "<cmd>set rnu!<CR>", "Göreceli satır numaralarını aç/kapat / Toggle relative numbers"),
-    ("n", "<leader>ch", "<cmd>NvCheatsheet<CR>", "NvChad kısayol rehberini aç / Toggle NvCheatsheet"),
-    ("n", "<leader>fm", "require('conform').format()", "Dosyayı formatla (Prettier/Conform) / Format file"),
+    ("n", "<leader>ch", "<cmd>NvCheatsheet<CR>", "NvChad kısayol rehberini aç (NvCheatsheet) / Toggle NvCheatsheet"),
+    ("n", "<leader>fm", "require('conform').format()", "Dosyayı formatla (Conform/Prettier) / Format file"),
 
     # Buffers & Tabs (tabufline)
     ("n", "<leader>b", "<cmd>enew<CR>", "Yeni boş tampon aç / New buffer"),
@@ -41,42 +41,69 @@ NVCHAD_BUILTIN_BINDINGS = [
     ("v", "<leader>/", "gc", "Seçili alanı yorum yap/kaldır / Toggle comment selection"),
 
     # File Tree (nvim-tree)
-    ("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", "Dosya ağacını aç/kapat / Toggle NvimTree file explorer"),
-    ("n", "<leader>e", "<cmd>NvimTreeFocus<CR>", "Dosya ağacına odaklan / Focus NvimTree"),
+    ("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", "Dosya ağacını aç/kapat (NvimTree) / Toggle NvimTree file explorer"),
+    ("n", "<leader>e", "<cmd>NvimTreeFocus<CR>", "Dosya gezginine odaklan (NvimTree) / Focus NvimTree"),
 
     # Telescope
     ("n", "<leader>ff", "<cmd>Telescope find_files<CR>", "Dosya ara (Telescope) / Find files"),
-    ("n", "<leader>fa", "<cmd>Telescope find_files hidden=true<CR>", "Gizli dosyalar dahil tümünü ara / Find all files"),
-    ("n", "<leader>fw", "<cmd>Telescope live_grep<CR>", "Proje içinde metin ara (Live Grep) / Live grep text"),
-    ("n", "<leader>fb", "<cmd>Telescope buffers<CR>", "Açık tamponları ara / Find open buffers"),
-    ("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", "Neovim yardım sayfalarını ara / Help pages"),
-    ("n", "<leader>fo", "<cmd>Telescope oldfiles<CR>", "Son açılan geçmiş dosyaları ara / Find recent files"),
-    ("n", "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<CR>", "Mevcut dosyada fuzzy ara / Fuzzy find in buffer"),
-    ("n", "<leader>cm", "<cmd>Telescope git_commits<CR>", "Git commit geçmişini listele / Git commits"),
-    ("n", "<leader>gt", "<cmd>Telescope git_status<CR>", "Git değişiklik durumunu göster / Git status"),
-    ("n", "<leader>th", "require('nvchad.themes').open()", "NvChad tema seçiciyi aç / Theme picker"),
+    ("n", "<leader>fa", "<cmd>Telescope find_files hidden=true<CR>", "Gizli dosyalar dahil tümünü ara (Telescope) / Find all files"),
+    ("n", "<leader>fw", "<cmd>Telescope live_grep<CR>", "Proje içinde canlı metin ara (Telescope Live Grep) / Live grep text"),
+    ("n", "<leader>fb", "<cmd>Telescope buffers<CR>", "Açık tamponları ara (Telescope) / Find open buffers"),
+    ("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", "Neovim yardım sayfalarını ara (Telescope) / Help pages"),
+    ("n", "<leader>fo", "<cmd>Telescope oldfiles<CR>", "Son açılan geçmiş dosyaları ara (Telescope) / Find recent files"),
+    ("n", "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<CR>", "Mevcut dosyada fuzzy ara (Telescope) / Fuzzy find in buffer"),
+    ("n", "<leader>cm", "<cmd>Telescope git_commits<CR>", "Git commit geçmişini listele (Telescope) / Git commits"),
+    ("n", "<leader>gt", "<cmd>Telescope git_status<CR>", "Git değişiklik durumunu göster (Telescope) / Git status"),
+    ("n", "<leader>pt", "<cmd>Telescope terms<CR>", "Arka plan terminallerini seç (Telescope) / Pick hidden term"),
+    ("n", "<leader>ma", "<cmd>Telescope marks<CR>", "Yer imleri ve işaretleri ara (Telescope marks) / Find marks"),
+    ("n", "<leader>th", "require('nvchad.themes').open()", "NvChad tema seçiciyi aç (Telescope Themes) / Theme picker"),
+
+    # Gitsigns
+    ("n", "]c", "gitsigns.next_hunk()", "Sonraki Git değişikliğine (hunk) git / Jump to next Git hunk"),
+    ("n", "[c", "gitsigns.prev_hunk()", "Önceki Git değişikliğine (hunk) git / Jump to prev Git hunk"),
+    ("n", "<leader>rh", "gitsigns.reset_hunk()", "Git değişikliğini geri al / Reset Git hunk"),
+    ("n", "<leader>ph", "gitsigns.preview_hunk()", "Git değişikliğini satırda önizle / Preview Git hunk"),
+    ("n", "<leader>gb", "gitsigns.blame_line()", "Satır yazarını göster (Git Blame) / Blame line author"),
+
+    # LSP (Language Server Protocol)
+    ("n", "gd", "vim.lsp.buf.definition", "Fonksiyon/sınıf tanımına git (LSP Definition) / Go to definition"),
+    ("n", "gD", "vim.lsp.buf.declaration", "Deklarasyona git (LSP Declaration) / Go to declaration"),
+    ("n", "gi", "vim.lsp.buf.implementation", "Arayüz implementasyonuna git (LSP) / Go to implementation"),
+    ("n", "gr", "vim.lsp.buf.references", "Sembolün tüm kullanımlarını/referanslarını bul (LSP References) / List references"),
+    ("n", "K", "vim.lsp.buf.hover", "Dokümantasyonu ve tip bilgisini göster (LSP Hover) / Hover info"),
+    ("n", "<leader>ls", "vim.lsp.buf.signature_help", "Fonksiyon parametre imzasını göster (LSP Signature) / Signature help"),
+    ("n", "<leader>D", "vim.lsp.buf.type_definition", "Tip tanımına git (LSP Type Definition) / Type definition"),
+    ("n", "<leader>ra", "nvchad.lsp.renamer", "Sembolü yeniden adlandır (LSP Rename/Refactor) / Rename symbol"),
+    ("n", "<leader>ca", "vim.lsp.buf.code_action", "Kod düzeltme ve aksiyonları (LSP Code Action) / Code action"),
+    ("n", "<leader>ds", "vim.diagnostic.setloclist", "Hata ve uyarı listesi (LSP Diagnostics) / Diagnostic loclist"),
+    ("n", "[d", "vim.diagnostic.goto_prev", "Önceki diagnostic hatasına git / Prev diagnostic"),
+    ("n", "]d", "vim.diagnostic.goto_next", "Sonraki diagnostic hatasına git / Next diagnostic"),
+    ("n", "<leader>wa", "vim.lsp.buf.add_workspace_folder", "LSP çalışma alanı klasörü ekle / Add workspace folder"),
+    ("n", "<leader>wr", "vim.lsp.buf.remove_workspace_folder", "LSP çalışma alanı klasörü kaldır / Remove workspace folder"),
+    ("n", "<leader>wl", "vim.lsp.buf.list_workspace_folders", "LSP çalışma alanı klasörlerini listele / List workspace folders"),
 
     # Terminals
     ("t", "<C-x>", "<C-\\><C-N>", "Terminal modundan çık / Escape terminal mode"),
     ("n", "<leader>h", "nvchad.term.new(sp)", "Yatay terminal aç / New horizontal terminal"),
     ("n", "<leader>v", "nvchad.term.new(vsp)", "Dikey terminal aç / New vertical terminal"),
-    ("n", "<A-i>", "nvchad.term.toggle(float)", "Yüzen terminali aç/kapat / Toggle floating terminal"),
+    ("n", "<A-i>", "nvchad.term.toggle(float)", "Yüzen terminali aç/kapat (Floating Terminal) / Toggle floating terminal"),
     ("n", "<A-h>", "nvchad.term.toggle(sp)", "Yatay terminali aç/kapat / Toggle horizontal terminal"),
     ("n", "<A-v>", "nvchad.term.toggle(vsp)", "Dikey terminali aç/kapat / Toggle vertical terminal"),
 
-    # LSP (Language Server Protocol)
-    ("n", "gd", "vim.lsp.buf.definition", "Tanıma git / Go to definition"),
-    ("n", "gD", "vim.lsp.buf.declaration", "Deklarasyona git / Go to declaration"),
-    ("n", "K", "vim.lsp.buf.hover", "Dokümantasyon / Hover info"),
-    ("n", "<leader>ra", "nvchad.lsp.renamer", "Sembolü yeniden adlandır (LSP Rename) / Rename symbol"),
-    ("n", "<leader>ca", "vim.lsp.buf.code_action", "Kod aksiyonları (Code Action) / Code action"),
-    ("n", "<leader>ds", "vim.diagnostic.setloclist", "Hata/uyarı listesi (Diagnostics) / Diagnostic loclist"),
-    ("n", "[d", "vim.diagnostic.goto_prev", "Önceki diagnostic hatasına git / Prev diagnostic"),
-    ("n", "]d", "vim.diagnostic.goto_next", "Sonraki diagnostic hatasına git / Next diagnostic"),
-
-    # WhichKey & OmniKey
-    ("n", "<leader>wK", "<cmd>WhichKey<CR>", "Tüm Neovim kısayollarını göster / WhichKey"),
+    # WhichKey & UI Tools
+    ("n", "<leader>wK", "<cmd>WhichKey<CR>", "Tüm Neovim kısayollarını göster (WhichKey) / WhichKey all keymaps"),
+    ("n", "<leader>wk", "WhichKey query", "WhichKey kısayol sorgulama / WhichKey query lookup"),
+    ("n", "<leader>cp", "minty.color_picker", "Minty renk paleti ve seçiciyi aç / Open Minty color picker"),
+    ("n", "<leader>sh", "minty.shade_picker", "Minty renk tonu seçiciyi aç / Open Minty shade picker"),
     ("n", "<leader>sk", "require('omnikey').search_keybindings", "Tüm sistem kısayollarını ara (OmniKey) / Search all system keybindings"),
+
+    # Mason, Lazy & Treesitter CLI Commands
+    ("n", ":Mason", "Mason", "Mason paket yöneticisi (LSP/Linter/Formatter kurucu) / Open Mason package manager"),
+    ("n", ":MasonUpdate", "MasonUpdate", "Mason paket kayıtlarını güncelle / Update Mason registries"),
+    ("n", ":Lazy", "Lazy", "Lazy eklenti yöneticisini aç / Open Lazy plugin manager"),
+    ("n", ":Lazy sync", "Lazy sync", "Tüm eklentileri senkronize et ve güncelle (Lazy) / Sync and update plugins"),
+    ("n", ":Lazy check", "Lazy check", "Eklenti güncellemelerini kontrol et (Lazy) / Check plugin updates"),
+    ("n", ":TSUpdate", "TSUpdate", "Treesitter sözdizimi ayrıştırıcılarını güncelle / Update Treesitter parsers"),
 ]
 
 

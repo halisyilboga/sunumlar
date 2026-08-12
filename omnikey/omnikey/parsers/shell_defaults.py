@@ -1,4 +1,4 @@
-"""Built-in standard Shell / Readline / ZLE / Vim keybindings for terminal mastery."""
+"""Built-in standard Shell / Readline / ZLE / Vim keybindings for terminal and editor mastery."""
 
 from pathlib import Path
 from typing import List
@@ -119,34 +119,36 @@ SHELL_BUILTIN_BINDINGS = [
         "combo": "alt+t",
         "action": "transpose-words",
         "desc": "İki kelimenin yerini değiştir / Transpose words",
-        "tags": ["transpose", "degistir", "değiştir", "word", "kelime", "zsh", "bash", "shell"],
+        "tags": ["transpose", "degistir", "değiştir", "kelime", "word", "zsh", "bash", "shell"],
         "tool": "zsh",
     },
     {
-        "combo": "alt+u",
-        "action": "up-case-word",
-        "desc": "Kelimeyi BÜYÜK harfe çevir / Uppercase word",
-        "tags": ["uppercase", "buyuk-harf", "büyük-harf", "word", "kelime", "zsh", "bash", "shell"],
+        "combo": "alt+.",
+        "action": "insert-last-word",
+        "desc": "Önceki komutun son argümanını yapıştır / Insert last argument of previous command",
+        "tags": ["argument", "arguman", "onceki", "gecmis", "history", "yapistir", "zsh", "bash", "shell"],
         "tool": "zsh",
     },
     {
-        "combo": "alt+l",
-        "action": "down-case-word",
-        "desc": "Kelimeyi küçük harfe çevir / Lowercase word",
-        "tags": ["lowercase", "kucuk-harf", "küçük-harf", "word", "kelime", "zsh", "bash", "shell"],
+        "combo": "ctrl+x ctrl+e",
+        "action": "edit-command-line",
+        "desc": "Mevcut komutu tam $EDITOR içinde düzenle / Edit command line in full editor (Vim/Nvim)",
+        "tags": ["editor", "vim", "nvim", "duzenle", "edit", "command", "satir", "zsh", "bash"],
         "tool": "zsh",
     },
     {
-        "combo": "alt+c",
-        "action": "capitalize-word",
-        "desc": "Kelimenin ilk harfini büyük yap / Capitalize word",
-        "tags": ["capitalize", "bas-harf", "baş-harf", "word", "kelime", "zsh", "bash", "shell"],
+        "combo": "alt+q",
+        "action": "push-line-or-edit",
+        "desc": "Yazılan komutu geçici olarak sakla, acil komut çalıştır ve geri getir / Push line to buffer",
+        "tags": ["push", "buffer", "gecici", "sakla", "zsh", "zle"],
         "tool": "zsh",
     },
 ]
 
-# Neovim / Vim Essential Builtin Line & Text Editing Bindings
+
+# Universal Vim & Neovim motions, operators, and essential commands
 NEOVIM_BUILTIN_BINDINGS = [
+    # --- Line & Word Deletion / Change ---
     {
         "combo": "D",
         "action": "delete-to-eol",
@@ -238,6 +240,145 @@ NEOVIM_BUILTIN_BINDINGS = [
         "tags": ["redo", "ileri-al", "yinele", "neovim", "nvim", "vim"],
         "tool": "neovim",
     },
+
+    # --- Search & Replace Commands ---
+    {
+        "combo": ":%s/eski/yeni/g",
+        "action": "search-replace-all",
+        "desc": "Tüm dosya içinde metni bul ve değiştir / Global find and replace",
+        "tags": ["replace", "degistir", "değiştir", "bul", "search", "global", "tum", "tüm", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": ":%s/eski/yeni/gc",
+        "action": "search-replace-confirm",
+        "desc": "Tüm dosya içinde onay isteyerek bul ve değiştir / Find and replace with confirmation",
+        "tags": ["replace", "degistir", "değiştir", "onay", "confirm", "search", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": ":g/desen/d",
+        "action": "delete-matching-lines",
+        "desc": "Belirtilen desene uyan tüm satırları sil / Delete all lines matching pattern",
+        "tags": ["delete", "sil", "desen", "pattern", "matching", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+
+    # --- Windows, Splits & Buffers ---
+    {
+        "combo": "ctrl+w v",
+        "action": "vsplit",
+        "desc": "Pencereyi dikey böl (yan yana) / Split window vertically",
+        "tags": ["split", "vsplit", "dikey", "bol", "window", "pencere", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "ctrl+w s",
+        "action": "split",
+        "desc": "Pencereyi yatay böl (alt alta) / Split window horizontally",
+        "tags": ["split", "yatay", "bol", "window", "pencere", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "ctrl+w =",
+        "action": "equalize-windows",
+        "desc": "Tüm açık bölme pencerelerinin boyutunu eşitle / Equalize split window sizes",
+        "tags": ["split", "esitle", "boyut", "equal", "window", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "ctrl+w q",
+        "action": "quit-window",
+        "desc": "Mevcut bölme penceresini kapat / Close current split window",
+        "tags": ["quit", "close", "kapat", "window", "split", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": ":bd",
+        "action": "bdelete",
+        "desc": "Mevcut açık dosyayı (buffer) kapat / Delete current buffer",
+        "tags": ["buffer", "tampon", "kapat", "bdelete", "dosya", "close", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": ":bnext",
+        "action": "bnext",
+        "desc": "Sonraki açık tampon dosyaya geç / Switch to next buffer",
+        "tags": ["buffer", "tampon", "next", "sonraki", "gecis", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": ":bprev",
+        "action": "bprev",
+        "desc": "Önceki açık tampon dosyaya geç / Switch to previous buffer",
+        "tags": ["buffer", "tampon", "prev", "onceki", "gecis", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": ":ls",
+        "action": "list-buffers",
+        "desc": "Açık olan tüm tampon dosyaları listele / List all open buffers",
+        "tags": ["buffer", "tampon", "list", "ls", "dosyalar", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+
+    # --- Navigation, Folding & Macros ---
+    {
+        "combo": "gg",
+        "action": "top-of-file",
+        "desc": "Dosyanın en başına git / Jump to top of file",
+        "tags": ["top", "bas", "başa", "git", "goto", "jump", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "G",
+        "action": "bottom-of-file",
+        "desc": "Dosyanın en sonuna git / Jump to bottom of file",
+        "tags": ["bottom", "son", "sonuna", "git", "goto", "jump", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "%",
+        "action": "match-paren",
+        "desc": "Eşleşen parantez veya bloğa atla / Jump to matching parenthesis or bracket",
+        "tags": ["bracket", "paren", "parantez", "eslesen", "atla", "jump", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "*",
+        "action": "search-word-forward",
+        "desc": "İmlecin altındaki kelimeyi ileriye doğru ara / Search current word forward",
+        "tags": ["search", "ara", "kelime", "word", "ileri", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "ctrl+v",
+        "action": "visual-block",
+        "desc": "Sütun/blok görsel seçim moduna geç / Enter visual block mode",
+        "tags": ["visual", "block", "sutun", "kolon", "secim", "select", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "za",
+        "action": "toggle-fold",
+        "desc": "Kod bloğu katlamasını aç/kapat / Toggle code fold",
+        "tags": ["fold", "katla", "ac", "kapat", "toggle", "kod", "blok", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "qa",
+        "action": "record-macro",
+        "desc": "'a' harfine makro kaydetmeye başla (q ile durdur) / Record macro into register 'a'",
+        "tags": ["macro", "makro", "kaydet", "record", "otomasyon", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
+    {
+        "combo": "@a",
+        "action": "play-macro",
+        "desc": "'a' harfine kaydedilen makroyu oynat / Execute macro 'a'",
+        "tags": ["macro", "makro", "oynat", "calistir", "play", "neovim", "nvim", "vim"],
+        "tool": "neovim",
+    },
 ]
 
 
@@ -269,7 +410,6 @@ class ShellDefaultsParser(BaseParser):
                 description=b["desc"],
                 mode="builtin",
             )
-            # Add explicit extra tags
             tags = sorted(list(set(tags + b["tags"])))
             results.append(
                 Keybinding(

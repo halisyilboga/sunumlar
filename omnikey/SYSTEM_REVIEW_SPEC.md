@@ -1,22 +1,25 @@
 # 📋 OmniKey — System Review Specification & Audit Brief
 
-> **Belge Amacı:** Bu doküman, **OmniKey** (Canlı Kısayol Takipçisi, Çift Dilli Semantik Arama Motoru, NvChad/Neovim, Herdr, Tmux ve Zsh Entegrasyonları) üzerinde gerçekleştirilen mimari, arama algoritması, parser'lar ve otomatik yedekleme mekanizmasının başka bir AI Agent (Code Reviewer / Architect / QA) tarafından bağımsız olarak denetlenmesi (review) amacıyla hazırlanmıştır.
+> **Belge Amacı:** Bu doküman, **OmniKey** (Canlı Kısayol & Linux Komut Takipçisi, Çift Dilli Semantik Arama Motoru, NvChad/Neovim, Herdr, Tmux ve Zsh Entegrasyonları) üzerinde gerçekleştirilen mimari, arama algoritması, parser'lar, tool filtreleme ve otomatik yedekleme mekanizmasının başka bir AI Agent (Code Reviewer / Architect / QA) tarafından bağımsız olarak denetlenmesi (review) amacıyla hazırlanmıştır.
 
 ---
 
 ## 📌 1. Yönetici Özeti (Executive Summary)
 
-**OmniKey**, modern terminal iş akışlarındaki tüm kısayol katmanlarını (`Herdr`, `Neovim / NvChad`, `Tmux`, `Zsh`, `Readline / Vim Standartları`) tek bir merkezde toplayan, canlı takip eden ve çift dilli (Türkçe/İngilizce) doğal dil araması sunan akıllı bir CLI aracıdır.
+**OmniKey**, modern terminal iş akışlarındaki tüm kısayol ve komut katmanlarını (`Herdr`, `Neovim / NvChad`, `Tmux`, `Zsh`, `Linux / Unix CLI Komutları`) tek bir merkezde toplayan, canlı takip eden ve çift dilli (Türkçe/İngilizce) doğal dil araması sunan akıllı bir CLI aracıdır.
 
 Bu review kapsamında denetlenecek temel alanlar:
 1. **Çift Dilli Doğal Dil ve Semantik Arama Motoru:** TR/EN sözlük, kök ayıklama (`strip_suffixes`), stop-word filtresi ve ağırlıklı puanlamalı sıralama (`relevancy scoring`).
-2. **NvChad & Çok Satırlı Lua Parser İyileştirmesi:** Lua `function() ... end`, `{ desc = "..." }` ve `opts "..."` formatlarının ayrıştırılması, NvChad standartlarının indekslenmesi.
-3. **Ekosistem Arayüzleri & Canlı Entegrasyonlar:**
+2. **Herdr Eksiksiz Hotkey & Panel/Worktree/Sekme Haritası:** `close_pane` (`prefix+x`), `remove_worktree` (`prefix+shift+x`), `split_vertical` (`prefix+v`), `split_horizontal` (`prefix+minus`), `zoom` (`prefix+z`), `new_tab` (`prefix+c`), `rename_pane` (`prefix+shift+p`), `cycle_pane_next` (`prefix+tab`), `previous/next workspace` (`prefix+p/n`), `agents` (`prefix+j/k`), `detach` (`prefix+d`) vb. eksiksiz yapılandırma.
+3. **NvChad Ekosistem Araçları & Anahtar Kelimeleri:** Telescope, NvimTree, LSP (Definition, Declaration, Hover, Rename, Code Actions, Diagnostics), Gitsigns (Hunks, Blame), Conform Formatter, Mason (LSP Installer), Lazy (Plugin Manager), Treesitter (Syntax), WhichKey, Minty (Color Picker), Tabufline ve Terminal araçlarının eksiksiz anahtar kelimelerle indekslenmesi (**382 toplam kayıt**).
+4. **Herdr & Tmux Resmi Standartları:** CLI komutları (`attach`, `list`, `kill`, `server`, `reload-config`) ve tüm varsayılan prefix tuşları.
+5. **Linux & CLI Cheat Sheet Modülü:** `locate`, `find`, `grep`, `lsof`, `kill -9`, `tar`, `chmod`, `rsync`, `ncdu`, `git stash` gibi 70+ kritik komut tarifinin sisteme entegrasyonu.
+6. **Ekosistem Arayüzleri & Canlı Tool Filtreleri:**
+   - FZF içi anlık Tool Filtreleri: `Ctrl+A` (Hepsi), `Ctrl+L` (Linux), `Ctrl+N` (Neovim), `Ctrl+H` (Herdr), `Ctrl+T` (Tmux), `Ctrl+Z` (Zsh) ve `@linux`, `@nvim` etiketleri.
    - Neovim içi Telescope özel arama eklentisi (`<leader>sk`).
    - Zsh ZLE widget'ı (`Ctrl+Space`, `Alt+K`) ve CLI kısayolları (`ok`, `oks`, `oksy`, `oke`).
-   - Herdr pop-up arama penceresi.
-4. **Otomatik Canlı Git Yedekleme (Hot Backup):** `sync`, `add`, `remove` veya arka plan izleyicisi (`watchdog`) tetiklendiğinde `omnikey_export.json` dosyasının otomatik güncellenmesi.
-5. **Format Sonrası Felaket Kurtarma (Disaster Recovery):** `restore.sh` ile sıfır veri kaybıyla anında kurulum.
+7. **Otomatik Canlı Git Yedekleme (Hot Backup):** `sync`, `add`, `remove` veya arka plan izleyicisi (`watchdog`) tetiklendiğinde `omnikey_export.json` dosyasının otomatik güncellenmesi.
+8. **Format Sonrası Felaket Kurtarma (Disaster Recovery):** `restore.sh` ile sıfır veri kaybıyla anında kurulum.
 
 ---
 
@@ -30,6 +33,7 @@ graph TD
         N["Neovim / NvChad (*.lua)"]
         Z["Zsh (.zshrc, .aliases)"]
         B["Builtin Shell / Vim Standards"]
+        L["Linux / CLI Command Recipes"]
     end
 
     subgraph Core["2. Semantik & Veri Katmanı"]
@@ -41,7 +45,7 @@ graph TD
 
     subgraph UI["3. Arayüz & Entegrasyonlar"]
         CLI["OmniKey CLI"]
-        FZF["Interactive FZF Popup"]
+        FZF["Interactive FZF Popup with Tool Hotkeys"]
         ZLE["Zsh ZLE Widget (Ctrl+Space / Alt+K)"]
         TEL["Neovim Telescope (<leader>sk)"]
         WATCH["Config Watcher Daemon (Debounced)"]
@@ -53,6 +57,7 @@ graph TD
     N --> TAG
     Z --> TAG
     B --> TAG
+    L --> TAG
     TAG --> DB
     DB --> AUDIT
     DB --> CONF
@@ -73,6 +78,7 @@ graph TD
 | :--- | :--- | :--- |
 | [`omnikey/semantic/tagger.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/semantic/tagger.py) | Çift dilli eş anlamlı haritası, ek temizleme, stop-word filtreleme | TR/EN lemma çıkarma (`strip_suffixes`), stopword filtreleme doğruluğu, `SYNONYM_MAP` kapsamı |
 | [`omnikey/db.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/db.py) | Veritabanı işlemleri ve puanlamalı arama algoritması | `list_keybindings` içindeki relevancy scoring (tam eşleşme: +120, çoklu token bonusu: +50, etiket eşleşmesi: +25) |
+| [`omnikey/parsers/linux_commands.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/parsers/linux_commands.py) | Linux/Unix terminal komutları & reçeteleri | `locate`, `find`, `grep`, `lsof`, `kill -9`, `tar`, `chmod` tanımları ve etiketleme |
 | [`omnikey/parsers/shell_defaults.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/parsers/shell_defaults.py) | Zsh/Readline ve Vim yerleşik kısayolları | Evrensel kısayol tanımlarının eksiksizliği (`ctrl+k`, `ctrl+u`, `ctrl+w`, `D`, `dd`, `d0` vb.) |
 
 ### B. Neovim & NvChad Entegrasyonu
@@ -82,9 +88,10 @@ graph TD
 | [`~/.config/nvim/lua/omnikey.lua`](file:///Users/halisyilboga/.config/nvim/lua/omnikey.lua) | Neovim Telescope özel picker | Telescope API uyumluluğu, JSON parse güvenliği ve `+` register'ına kopyalama |
 | [`~/.config/nvim/lua/mappings.lua`](file:///Users/halisyilboga/.config/nvim/lua/mappings.lua) | NvChad kullanıcı tuş ataması | `<leader>sk` mapping tanımlaması |
 
-### C. Yaşayan Konfigürasyon ve Otomatik Git Yedekleme
+### C. FZF Arayüzü, Canlı Tool Filtreleri ve Yedekleme
 | Dosya Yolu | Sorumluluk | Review Odak Noktası |
 | :--- | :--- | :--- |
+| [`omnikey/ui/fzf_search.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/ui/fzf_search.py) | FZF interaktif arama penceresi | `Ctrl+A/L/N/H/T/Z` hotkey bağlamaları, `@tool` tag desteği, renkli tool rozetleri ve panoya kopyalama |
 | [`omnikey/cli.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/cli.py) | Komut satırı arayüzü | `cmd_sync`, `cmd_add`, `cmd_remove` işlemlerinde otomatik `omnikey_export.json` dışa aktarımı |
 | [`omnikey/watcher.py`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/watcher.py) | Canlı dosya izleyici (watchdog) | Debounce mekanizması (0.5s), dosya değişikliğinde anında veritabanı senkronizasyonu ve otomatik export |
 | [`omnikey/integrations/omnikey.zsh`](file:///Users/halisyilboga/develop/studyws/sunumlar/omnikey/omnikey/integrations/omnikey.zsh) | Zsh terminal entegrasyonu | PATH yönetimi, ZLE widget (`Ctrl+Space`, `Alt+K`), `ok`, `oks`, `oksy`, `oke` takma adları |
@@ -93,7 +100,7 @@ graph TD
 
 ## 🧪 4. Doğrulama ve Test Kapsamı
 
-Testler `unittest` kütüphanesi ile yazılmış olup 21 ayrı test senaryosunu doğrulamaktadır:
+Testler `unittest` kütüphanesi ile yazılmış olup 24 ayrı test senaryosunu doğrulamaktadır:
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -107,12 +114,12 @@ python3 -m unittest discover -s tests -v
    - Kelime silme: *"kelime sil"* ve *"delete word forward"* ➜ `ctrl+w`, `alt+d`, `diw`.
    - Ekran temizleme: *"ekranı temizle"* ve *"clear terminal screen"* ➜ `ctrl+l`.
 2. **`test_parsers.py`:**
-   - Herdr TOML parser doğrulaması (`keys.prefix`, `keys.command`, workspace/agent/worktree mappingleri).
-   - Tmux `.tmux.conf` parser doğrulaması (bind/bind-key, prefix, -n flags).
-   - Neovim Lua parser doğrulaması (`map`, `vim.keymap.set`, opts table, multi-line).
+   - Herdr TOML parser doğrulaması.
+   - Tmux `.tmux.conf` parser doğrulaması.
+   - Neovim Lua parser doğrulaması.
    - Zsh alias & bindkey parser doğrulaması.
 3. **`test_db.py` & `test_conflict.py`:**
-   - Upsert bütünlüğü, tag indeksleme, audit log geçmişi ve araçlar arası tuş çakışması tespiti.
+   - Deduplication garantisi, upsert bütünlüğü, tag indeksleme, audit log geçmişi ve çakışma tespiti.
 4. **`test_export_import.py`:**
    - JSON export ve Disaster Recovery (import) sıfır veri kaybı testi.
 
@@ -125,13 +132,15 @@ Gözden geçirme yapacak Agent'ın şu soruları yanıtlaması önerilir:
 1. **Doğal Dil Arama Kalitesi:**
    - Eklenen Türkçe ve İngilizce stop-word filtresi ile normalizasyon algoritması uç durumlarda (edge cases) beklenmedik filtreleme yapıyor mu?
    - Relevancy scoring formülü adil ve dengeli mi?
-2. **Hata Dayanıklılığı ve Güvenlik (Resilience & Safety):**
+2. **Deduplication & Veri Bütünlüğü:**
+   - Tüm kaynak dosyalar (disk + builtin) tarandığında mükerrer kayıt oluşumu engelleniyor mu?
+3. **Hata Dayanıklılığı ve Güvenlik (Resilience & Safety):**
    - SQLite `FOREIGN KEY` ve `ON CONFLICT` mekanizmaları çoklu eş zamanlı işlemlerde güvenli mi?
    - Dosya okuma hatalarında (UTF-8 decode, bozuk TOML/Lua dosyaları) parser'lar graceful degradation sağlıyor mu?
-3. **Performans:**
-   - 200+ kısayol içeren veritabanında FZF ve Neovim Telescope aramaları gecikmesiz (<15ms) çalışıyor mu?
+4. **Performans:**
+   - FZF ve Neovim Telescope aramaları gecikmesiz (<15ms) çalışıyor mu?
    - `watchdog` debounce mekanizması disk IO yükünü engelliyor mu?
-4. **Disaster Recovery (Kurtarılabilirlik):**
+5. **Disaster Recovery (Kurtarılabilirlik):**
    - `restore.sh` ve `omnikey_export.json` temiz bir macOS/Linux sisteminde ek bağımlılık olmadan çalışabilecek yapıda mı?
 
 ---

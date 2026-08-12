@@ -1,0 +1,15 @@
+# 🔄 Loop-Me: Bu Deponun Yaşayan Döngüleri ve Ajan Mimarisi
+
+Bir geliştiricinin günlük pratiklerine uzaktan baktığınızda, karmaşık görünen her şeyin aslında iç içe geçmiş öngörülebilir döngülerden (loops) ibaret olduğunu fark edersiniz: sabahları tünelleri açmak, sunum slaytlarını derlemek, yapay zeka ajanlarına görev paylaştırmak ve terminal pencereleri arasında geçiş yapmak. Bir yaşamı ya da bir repoyu "loop merceğinden" incelemek, neyin rutin, neyin otomatikleştirilebilir ve en önemlisi neyin bir yapay zeka ajanına güvenle delege edilebilir olduğunu kristalize eder.
+
+`sunumlar` deposu, ilk bakışta sadece statik sunumların barındığı bir klasör gibi görünse de, kaputun altına indiğinizde bu döngüleri işleten, kendi kendini güncelleyen ve AI ajanlarıyla ortaklaşa yaşayan dinamik bir kontrol merkezidir.
+
+## 1. Ajan Orkestrasyon Döngüsü: BMAD ve Uzmanlaşmış İş Akışları
+
+Bu depodaki ilk ve en kritik döngü, bilişsel yükü tek bir genel modele yüklemek yerine görevleri uzmanlaşmış alt ajanlara dağıtan **BMAD (Benchmark Multi-Agent Design)** ekosistemidir. `.agent/workflows/` dizini altında yaşayan onlarca iş akışı (workflow), her biri tek bir işi kusursuz yapmaya programlanmış sanal bir mühendislik ekibi gibi çalışır:
+
+* **Strateji ve Tasarım Döngüsü:** Bir fikir ortaya atıldığında `/analyst` ve `/architect` devreye girer; gereksinimleri PRD ve mimari kararlara dönüştürür.
+* **Uygulama ve Denetim Döngüsü:** `/dev` kodu üretirken, `/qa` ve `/code-review` bağımsız alt süreçlerde kodun standartlara ve sınırlara uygunluğunu acımasızca sınar.
+* **Hikayeleştirme ve Sadeleştirme:** `/storyteller` ve `/editorial-review-prose`, teknik karmaşıklığı insan zihninin kolayca kavrayabileceği temiz anlatılara dönüştürür.
+
+Bu döngünün kalbinde **"Push-Right" (Kontrolü Sona Öteleme)** prensibi yatar: Ajanlar işi tamamlayıp her detayı hazır hale getirene kadar insan geliştiriciyi gereksiz sorularla bölmez; karar noktasına gelindiğinde yalnızca onaylanmaya hazır, net bir karar özeti (brief) sunar.

@@ -7,9 +7,14 @@
 ## 🎯 Özellikler
 
 - ⚡ **Living Config Watcher:** `watchdog` ile `~/.config/herdr/config.toml`, `~/.tmux.conf`, `~/.config/nvim/lua/**/*.lua` ve `~/.zshrc` dosyalarını anlık izler.
-- 🔍 **Bilingual Semantic Search (TR/EN):** Eylem isimlerini ve açıklamalarını Türkçe/İngilizce etiketlerle eşler (Örn: `sil` veya `remove` aratıldığında `prefix+x` / `remove_worktree` anında bulunur).
-- 🧩 **Interactive `fzf` Popup:** Terminalin her yerinden `Ctrl+Space` veya `Alt+K` ile açılan, seçilen tuşu panoya kopyalayan yüzen arama penceresi.
-- ⚔️ **Cross-Tool Conflict Detector:** Herdr, Tmux, Neovim ve Zsh arasındaki aynı tuş atamalarını (Örn: `ctrl+s` / `prefix+j` çakışmaları) tespit eder ve uyarır.
+- 🦙 **Herdr Official CLI & Keymaps:** `herdr session attach`, `herdr session list`, `herdr workspace/worktree`, `herdr server reload-config` ve tüm resmi prefix kısayollarını (`prefix+?`, `prefix+s`, `prefix+d/q`, `prefix+w`, `prefix+g`, `prefix+shift+n/g/w/d`, `prefix+c`, `prefix+z`, `prefix+v/-`, `prefix+r`, `prefix+b` vb.) içerir.
+- 🪟 **Tmux Official CLI & Keymaps:** `tmux attach -t`, `tmux a`, `tmux ls`, `tmux new -s`, `tmux kill-session` ve tüm standart kısayolları (`prefix+d`, `prefix+s`, `prefix+w`, `prefix+c`, `prefix+,`, `prefix+$`, `prefix+x`, `prefix+%/"`, `prefix+z`, `prefix+[` vb.) içerir.
+- ✏️ **Vim / Neovim Power Commands:** `:%s/eski/yeni/g`, `:%s/eski/yeni/gc`, `:g/pattern/d`, `<C-w>v/s/q/=`, `:bnext/:bprev/:bd`, `gg/G/%/*/#`, `v/V/<C-v>`, `qa/@a/@@`, `za/zc/zo/zR/zM`, `D/C/dd/cc/yy/p/P/u/<C-r>` vb.
+- 🐧 **Linux & CLI Cheat Sheet:** En sık kullanılan dosya bulma (`find`, `locate`, `fd`, `ripgrep`), port/süreç yönetimi (`lsof`, `kill -9`, `htop`), arşivleme (`tar`, `zip`), servisler (`systemctl`, `brew services`), ağ (`curl`, `rsync`, `ssh`, `ss`, `dig`) ve Git kurtarma komutlarını içerir.
+- 🔍 **Bilingual Semantic Search (TR/EN):** Eylem isimlerini ve açıklamalarını Türkçe/İngilizce etiketlerle eşler (Örn: `herdr onceki session attach et` veya `portu kullanan süreci öldür` anında bulunur).
+- 🎛️ **Canlı Tool Filtreleri:** `@linux`, `@nvim`, `@herdr`, `@tmux`, `@zsh` etiketleri veya `Ctrl+A/L/N/H/T/Z` kısayollarıyla araçlar arası anında geçiş.
+- 🧩 **Interactive `fzf` Popup:** Terminalin her yerinden `Ctrl+Space` veya `Alt+K` ile açılan, seçilen komutu/tuşu panoya kopyalayan yüzen arama penceresi.
+- ⚔️ **Cross-Tool Conflict Detector:** Herdr, Tmux, Neovim ve Zsh arasındaki aynı tuş atamalarını tespit eder ve uyarır.
 - 📜 **Trackable SQLite Audit Log:** Yapılan her ekleme (`ADDED`), güncelleme (`UPDATED`), silme (`DELETED`) ve çakışmayı (`CONFLICT_DETECTED`) zaman damgasıyla kaydeder.
 - 💾 **Disaster Recovery & GitHub Backup:** `omnikey_export.json` ve `restore.sh` sayesinde bilgisayar formatlandığında tek komutla sıfır kayıpla tüm yapılandırmayı ve kısayol hafızasını geri yükler.
 - 🔭 **Neovim Telescope Extension:** Neovim içinde `<leader>sk` ile tüm sistem kısayollarını arayabilme.
@@ -24,30 +29,35 @@ cd omnikey
 ./install.sh
 ```
 
-Bu komut:
-1. Python paketini kurar (`pip install -e .`).
-2. `omnikey` komutunu sisteme bağlar.
-3. Tüm konfigürasyon dosyalarınızı (`herdr`, `tmux`, `nvim`, `zsh`) SQLite veritabanına indeksler.
-4. `~/.zshrc` dosyasına ZLE widget ve kısayollarını ekler.
-5. GitHub için ilk anlık yedek (`omnikey_export.json`) dosyasını üretir.
-
 ---
 
-## 🚀 Kullanım ve CLI Komutları
+## 🚀 Kullanım ve Arama Filtreleri
+
+### A) İnteraktif Arama & Canlı Filtreler (FZF Popup)
+Terminalde `Ctrl+Space` veya `Alt+K` bastığınızda açılan pencerede:
+* **Hızlı Tuş Filtreleri:**
+  * `Ctrl + A` ➜ **Tümü (All Tools)**
+  * `Ctrl + L` ➜ **Linux / CLI Komutları**
+  * `Ctrl + N` ➜ **Neovim / NvChad**
+  * `Ctrl + H` ➜ **Herdr**
+  * `Ctrl + T` ➜ **Tmux**
+  * `Ctrl + Z` ➜ **Zsh / Readline**
+* **Etiketle Filtreleme:** Arama kutusuna `@linux`, `@nvim`, `@herdr`, `@tmux`, `@zsh` yazabilirsiniz (Örn: `@linux dosya bul` veya `@nvim buffer`).
+
+### B) CLI Komutları
 
 | Komut | Açıklama |
 | :--- | :--- |
 | `omnikey search [sorgu]` | `fzf` ile interaktif arama yapar, Enter ile tuşu panoya kopyalar |
+| `omnikey search -t linux "port"` | Sadece Linux komutlarında arama yapar |
+| `omnikey search -t neovim "buffer"` | Sadece Neovim kısayollarında arama yapar |
 | `omnikey list` | Tüm kayıtlı kısayolları renkli tablo olarak listeler (`--json` destekler) |
 | `omnikey sync` | Tüm konfigürasyon dosyalarını yeniden tarayıp veritabanını günceller |
 | `omnikey conflicts` | Sistemdeki araçlar arası tuş çakışmalarını analiz eder |
 | `omnikey history` | Değişiklik geçmişini ve audit log kayıtlarını listeler |
-| `omnikey add <combo> <desc>` | Manuel kısayol/not ekler (Örn: `omnikey add "prefix+w" "Workspace list" -t herdr`) |
-| `omnikey remove <id>` | Belirtilen ID'ye sahip kısayolu siler |
 | `omnikey watch` | Arka planda konfigürasyon dosyalarını canlı izleyen daemon'ı başlatır |
 | `omnikey export` | Veritabanını Git için `omnikey_export.json` dosyasına aktarır |
 | `omnikey import <dosya>` | JSON yedeğinden veritabanını geri yükler |
-| `omnikey doctor` | Sistem sağlık ve dosya bağlantı kontrollerini çalıştırır |
 
 ---
 
