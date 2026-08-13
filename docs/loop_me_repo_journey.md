@@ -13,3 +13,13 @@ Bu depodaki ilk ve en kritik döngü, bilişsel yükü tek bir genel modele yük
 * **Hikayeleştirme ve Sadeleştirme:** `/storyteller` ve `/editorial-review-prose`, teknik karmaşıklığı insan zihninin kolayca kavrayabileceği temiz anlatılara dönüştürür.
 
 Bu döngünün kalbinde **"Push-Right" (Kontrolü Sona Öteleme)** prensibi yatar: Ajanlar işi tamamlayıp her detayı hazır hale getirene kadar insan geliştiriciyi gereksiz sorularla bölmez; karar noktasına gelindiğinde yalnızca onaylanmaya hazır, net bir karar özeti (brief) sunar.
+
+## 2. Bağlam ve Terminal Döngüsü: OmniKey, Herdr ve Format Sonrası Kurtarma
+
+Ajanlar ve insan geliştirici aynı ekosistemde çalışırken karşılaşılan en büyük sürtünme **bağlam kaybı ve arayüz çakışmalarıdır**. Çoklu ajan oturumları (Herdr), gelişmiş editör katmanları (Neovim), terminal çoğullayıcıları (Tmux) ve kabuk yapılandırmaları (Zsh) arasında düzinelerce kısayol ve konfigürasyon dosyası uçuşur.
+
+Bu depoda inşa ettiğimiz **OmniKey**, bu kaosu öngörülebilir bir döngüye dönüştürür:
+
+* **Canlı İzleme (Living Watcher):** `config.toml`, `.tmux.conf` veya `mappings.lua` dosyalarındaki her tuş değişikliğini `watchdog` ile anında yakalar, diff analizini çıkarır ve yerel SQLite veritabanına işler.
+* **Çift Dilli Anlamsal Etiketleme & Çakışma Denetimi:** Eylemleri otomatik olarak Türkçe ve İngilizce arama terimleriyle eşlerken (örn: `remove_worktree` ➡️ `sil, worktree, remove`), Herdr ve Tmux arasındaki potansiyel tuş çakışmalarını (örn: `ctrl+s`, `prefix+j`) anında tespit edip raporlar.
+* **Sıfır Kayıp ve Kurtarılabilirlik (Disaster Recovery):** Bir geliştiricinin en büyük korkusu makinesini sıfırladığında tüm bu bilişsel ergonomiyi kaybetmektir. OmniKey, tüm veritabanı durumunu `omnikey_export.json` olarak Git'e yedekler ve format sonrası tek bir `./restore.sh` komutuyla tüm terminal zekasını saniyeler içinde eski haline getirir.

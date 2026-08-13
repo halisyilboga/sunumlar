@@ -104,6 +104,8 @@ def run_fzf_search(
             tool_tag += " @nvim"
         elif tool_name in ("linux", "cli"):
             tool_tag += " @cli"
+        elif tool_name in ("git", "vcs"):
+            tool_tag += " @vcs"
 
         # Clean bilingual breakdown
         desc = kb.description or kb.action_raw
@@ -121,8 +123,8 @@ def run_fzf_search(
 
     header_text = (
         "OmniKey Universal Cheat & Shortcut Hub\n"
-        "⚡ Filters: Ctrl+A (All) | Ctrl+H (Herdr) | Ctrl+N (Nvim) | Ctrl+L (Linux) | Ctrl+T (Tmux) | Ctrl+Z (Zsh)\n"
-        "🏷️  Exact Tags: '@herdr | '@nvim | '@linux | '@tmux | '@zsh (Press Ctrl+H/N/L/T/Z for 1-click filter)\n"
+        "⚡ Filters: Ctrl+A (All) | Ctrl+G (Git) | Ctrl+H (Herdr) | Ctrl+N (Nvim) | Ctrl+L (Linux) | Ctrl+T (Tmux) | Ctrl+Z (Zsh)\n"
+        "🏷️  Exact Tags: '@git | '@herdr | '@nvim | '@linux | '@tmux | '@zsh (Press Ctrl+G/H/N/L/T/Z for 1-click filter)\n"
         "⏎ Action: Enter to copy key/command to clipboard | Esc: Exit"
     )
 
@@ -147,6 +149,7 @@ def run_fzf_search(
         f"--preview={preview_cmd}",
         # Interactive Tool switching keybindings (Exact matching with ')
         "--bind=ctrl-a:change-query()",
+        "--bind=ctrl-g:change-query('@git )",
         "--bind=ctrl-h:change-query('@herdr )",
         "--bind=ctrl-n:change-query('@nvim )",
         "--bind=ctrl-l:change-query('@linux )",

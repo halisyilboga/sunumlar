@@ -17,6 +17,7 @@ from omnikey.config import (
 from omnikey.db import Database
 from omnikey.models import Keybinding
 from omnikey.parsers import ALL_PARSERS, get_parser_for_file
+from omnikey.parsers.git_commands import GitCommandsParser
 from omnikey.parsers.herdr import HerdrParser
 from omnikey.parsers.linux_commands import LinuxCommandsParser
 from omnikey.parsers.neovim import NeovimParser
@@ -256,6 +257,25 @@ def cmd_sync(args, db: Database) -> None:
         f"{DIM}={nv_stats['unchanged']}{RESET}"
     )
 
+    # Always sync Git version control recipes (Branch, Stash, Rebase, Worktree, Bisect, Reflog)
+    git_kbs = GitCommandsParser.get_all_git_recipes()
+    git_stats = db.sync_file_keybindings(
+        tool="git",
+        source_file="builtin://git_recipes",
+        new_kbs=git_kbs,
+    )
+    for k in total_stats:
+        total_stats[k] += git_stats[k]
+    found_files += 1
+    print(
+        f"{color_tool('git'):<18} {DIM}builtin://git_recipes (Branch, Stash, Rebase, Worktree, Bisect){RESET}\n"
+        f"  └─ Parsed: {len(git_kbs)} recipes | "
+        f"{GREEN}+{git_stats['added']}{RESET} "
+        f"{YELLOW}~{git_stats['updated']}{RESET} "
+        f"{RED}-{git_stats['deleted']}{RESET} "
+        f"{DIM}={git_stats['unchanged']}{RESET}"
+    )
+
     print("\n" + "=" * 55)
     print(
         f"{BOLD}Sync Complete!{RESET} ({found_files} files scanned)\n"
@@ -289,7 +309,7 @@ def cmd_search(args, db: Database) -> None:
     search_query = raw_query
     fzf_query = raw_query
 
-    # Auto-extract @tool from query (e.g. "@linux port", "@nvim buffer", or "@herdr")
+    # Auto-extract @tool from query (e.g. "@git branch", "@linux port", "@nvim buffer", or "@herdr")
     if raw_query.startswith("@"):
         parts = raw_query.split(None, 1)
         tag = parts[0][1:].lower()
@@ -297,6 +317,8 @@ def cmd_search(args, db: Database) -> None:
             tool_filter = "neovim"
         elif tag in ("linux", "cli"):
             tool_filter = "linux"
+        elif tag in ("git", "vcs"):
+            tool_filter = "git"
         elif tag in ("herdr", "tmux", "zsh", "builtin"):
             tool_filter = tag
         search_query = parts[1] if len(parts) > 1 else ""

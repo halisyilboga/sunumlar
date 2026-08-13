@@ -1,17 +1,20 @@
-"""Parser for Herdr TOML configuration files (~/.config/herdr/config.toml) and built-in commands."""
+"""Herdr TOML configuration parser and official standard built-in actions."""
 
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from omnikey.models import Keybinding
-from omnikey.parsers.base import BaseParser
-from omnikey.semantic.tagger import SemanticTagger
-
 try:
     import tomllib
 except ImportError:
-    tomllib = None  # type: ignore
+    try:
+        import tomli as tomllib  # Python < 3.11 fallback
+    except ImportError:
+        tomllib = None
+
+from omnikey.models import Keybinding
+from omnikey.parsers.base import BaseParser
+from omnikey.semantic.tagger import SemanticTagger
 
 
 # Built-in friendly descriptions for Herdr actions
@@ -42,6 +45,8 @@ HERDR_ACTION_DESCRIPTIONS = {
     "previous_agent": "Önceki AI ajanına odaklan / Focus previous agent",
     "next_agent": "Sonraki AI ajanına odaklan / Focus next agent",
     "focus_agent": "İndeksli AI ajanına odaklan (1-9) / Focus agent 1-9",
+    "open_notification_target": "Bildirim hedefine veya ajana git / Jump to active agent notification",
+    "last_pane": "Son kullanılan panele hızlı geçiş yap / Jump to last active pane",
     "detach": "Oturumdan ayrıl (detach) / Detach session",
     "reload_config": "Yapılandırma dosyasını yeniden yükle / Reload config",
     "help": "Herdr yardım menüsünü aç / Open Herdr help",
@@ -81,6 +86,7 @@ HERDR_BUILTIN_STANDARDS: List[Tuple[str, str, str, str, List[str]]] = [
     ("prefix+g", "prefix", "goto", "Hızlı navigasyon modu (Goto) / Quick navigate mode", ["herdr", "goto", "navigate", "yonlen", "git"]),
     ("prefix+shift+n", "prefix", "new_workspace", "Yeni çalışma alanı oluştur / Create new workspace", ["herdr", "new", "workspace", "yeni", "alan"]),
     ("prefix+shift+g", "prefix", "new_worktree", "Yeni Git worktree oluştur / Create new Git worktree", ["herdr", "new", "worktree", "git", "dal"]),
+    ("prefix+shift+o", "prefix", "open_worktree", "Git worktree aç ve seç / Open Git worktree", ["herdr", "open", "worktree", "ac", "git", "sec"]),
     ("prefix+shift+w", "prefix", "rename_workspace", "Çalışma alanını yeniden adlandır / Rename workspace", ["herdr", "rename", "workspace", "adlandir"]),
     ("prefix+shift+d", "prefix", "close_workspace", "Çalışma alanını kapat / Close workspace", ["herdr", "close", "workspace", "kapat", "sil"]),
     ("prefix+c", "prefix", "new_tab", "Yeni sekme aç / Open new tab", ["herdr", "new", "tab", "yeni", "sekme"]),
@@ -96,12 +102,14 @@ HERDR_BUILTIN_STANDARDS: List[Tuple[str, str, str, str, List[str]]] = [
     ("prefix+b", "prefix", "toggle_sidebar", "Kenar çubuğunu aç/kapat / Toggle sidebar", ["herdr", "sidebar", "toggle", "kenar", "cubuk"]),
     ("prefix+tab", "prefix", "cycle_pane_next", "Sonraki panele odaklan / Cycle next pane", ["herdr", "cycle", "pane", "next", "sonraki", "panel"]),
     ("prefix+shift+tab", "prefix", "cycle_pane_previous", "Önceki panele odaklan / Cycle previous pane", ["herdr", "cycle", "pane", "prev", "onceki", "panel"]),
+    ("prefix+l", "prefix", "last_pane", "Son kullanılan panele hızlı geçiş yap / Jump to last active pane", ["herdr", "last", "pane", "son", "panel", "gecis"]),
     ("prefix+p", "prefix", "previous_workspace", "Önceki çalışma alanına geç / Previous workspace", ["herdr", "prev", "workspace", "onceki", "alan"]),
     ("prefix+n", "prefix", "next_workspace", "Sonraki çalışma alanına geç / Next workspace", ["herdr", "next", "workspace", "sonraki", "alan"]),
     ("prefix+1..9", "prefix", "switch_workspace", "İndeksli çalışma alanına geç (1-9) / Switch workspace 1-9", ["herdr", "switch", "workspace", "gecis", "alan"]),
-    ("prefix+j", "prefix", "next_agent", "Sonraki AI ajanına odaklan / Focus next agent", ["herdr", "next", "agent", "sonraki", "ajan", "ai"]),
-    ("prefix+k", "prefix", "previous_agent", "Önceki AI ajanına odaklan / Focus previous agent", ["herdr", "prev", "agent", "onceki", "ajan", "ai"]),
-    ("prefix+alt+1..9", "prefix", "focus_agent", "İndeksli AI ajanına odaklan (1-9) / Focus agent 1-9", ["herdr", "focus", "agent", "odaklan", "ajan", "ai"]),
+    ("prefix+j", "prefix", "next_agent", "Sonraki AI ajanına odaklan / Focus next agent", ["herdr", "next", "agent", "sonraki", "ajan", "ai", "asistan"]),
+    ("prefix+k", "prefix", "previous_agent", "Önceki AI ajanına odaklan / Focus previous agent", ["herdr", "prev", "agent", "onceki", "ajan", "ai", "asistan"]),
+    ("prefix+alt+1..9", "prefix", "focus_agent", "İndeksli AI ajanına odaklan (1-9) / Focus agent 1-9", ["herdr", "focus", "agent", "odaklan", "ajan", "ai", "asistan"]),
+    ("prefix+o", "prefix", "open_notification_target", "Bildirim hedefine veya ajana git / Jump to active agent notification", ["herdr", "notification", "agent", "bildirim", "ajan", "ai", "odaklan"]),
     ("prefix+[", "prefix", "previous_tab", "Önceki sekmeye geç / Previous tab", ["herdr", "prev", "tab", "onceki", "sekme"]),
     ("prefix+]", "prefix", "next_tab", "Sonraki sekmeye geç / Next tab", ["herdr", "next", "tab", "sonraki", "sekme"]),
 ]
@@ -125,13 +133,24 @@ class HerdrParser(BaseParser):
             except Exception:
                 pass
 
-        # Fallback simple line parser for [keys]
-        result: Dict[str, Any] = {"keys": {}}
+        # Fallback simple line parser for [keys] and [[keys.command]]
+        result: Dict[str, Any] = {"keys": {"command": []}}
         current_section = None
+        current_cmd_entry = None
+
         for line in content.splitlines():
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
+
+            array_table_match = re.match(r"^\[\[([^\]]+)\]\]", line)
+            if array_table_match:
+                current_section = array_table_match.group(1).strip()
+                if current_section == "keys.command":
+                    current_cmd_entry = {}
+                    result["keys"]["command"].append(current_cmd_entry)
+                continue
+
             section_match = re.match(r"^\[([^\]]+)\]", line)
             if section_match:
                 current_section = section_match.group(1).strip()
@@ -144,6 +163,12 @@ class HerdrParser(BaseParser):
                 if kv_match:
                     k, v = kv_match.groups()
                     result["keys"][k] = v
+            elif current_section == "keys.command" and current_cmd_entry is not None:
+                kv_match = re.match(r"^([a-zA-Z0-9_\-]+)\s*=\s*[\"']([^\"']+)[\"']", line)
+                if kv_match:
+                    k, v = kv_match.groups()
+                    current_cmd_entry[k] = v
+
         return result
 
     def parse(self, file_path: Path) -> List[Keybinding]:
@@ -160,13 +185,14 @@ class HerdrParser(BaseParser):
         if not isinstance(keys_section, dict):
             return []
 
-        prefix_key = keys_section.get("prefix", "ctrl+s")
+        prefix_key = keys_section.get("prefix", "ctrl+b")
         keybindings: List[Keybinding] = []
 
         # 1. Base Prefix Key
         if prefix_key:
-            desc = f"Herdr komut modu ön-eki (Prefix: {prefix_key})"
+            desc = f"Herdr komut modu ön-eki (Prefix: {prefix_key}) / Herdr command prefix key"
             tags = SemanticTagger.generate_tags("herdr", prefix_key, "prefix", desc, mode="normal")
+            tags.extend(["herdr", "prefix", "on-ek", "leader", "trigger"])
             keybindings.append(
                 Keybinding(
                     tool="herdr",
@@ -175,13 +201,13 @@ class HerdrParser(BaseParser):
                     description=desc,
                     source_file=str(file_path.resolve()),
                     mode="normal",
-                    tags=tags,
+                    tags=sorted(list(set(tags))),
                 )
             )
 
         # 2. Key Actions in [keys]
         for action_name, combo in keys_section.items():
-            if action_name == "prefix" or not isinstance(combo, str) or not combo.strip():
+            if action_name in ("prefix", "command") or not isinstance(combo, str) or not combo.strip():
                 continue
 
             full_combo = combo.strip()
@@ -199,6 +225,7 @@ class HerdrParser(BaseParser):
                 description=desc,
                 mode=mode,
             )
+            tags.extend(["herdr", "multiplexer", action_name])
 
             keybindings.append(
                 Keybinding(
@@ -208,7 +235,7 @@ class HerdrParser(BaseParser):
                     description=desc,
                     source_file=str(file_path.resolve()),
                     mode=mode,
-                    tags=tags,
+                    tags=sorted(list(set(tags))),
                 )
             )
 
@@ -222,8 +249,9 @@ class HerdrParser(BaseParser):
                 c = cmd_entry.get("command")
                 t = cmd_entry.get("type", "shell")
                 if k and c:
-                    desc = f"Herdr komutu: {c} ({t})"
+                    desc = f"Herdr özel {t} komutu: {c} / Custom {t} command: {c}"
                     tags = SemanticTagger.generate_tags("herdr", k, c, desc, mode="custom")
+                    tags.extend(["herdr", "command", "popup", "custom", c])
                     keybindings.append(
                         Keybinding(
                             tool="herdr",
@@ -232,7 +260,7 @@ class HerdrParser(BaseParser):
                             description=desc,
                             source_file=str(file_path.resolve()),
                             mode="custom",
-                            tags=tags,
+                            tags=sorted(list(set(tags))),
                         )
                     )
 

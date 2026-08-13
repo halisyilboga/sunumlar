@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from omnikey.parsers.base import BaseParser
+from omnikey.parsers.git_commands import GitCommandsParser
 from omnikey.parsers.herdr import HerdrParser
 from omnikey.parsers.linux_commands import LinuxCommandsParser
 from omnikey.parsers.neovim import NeovimParser
@@ -18,6 +19,7 @@ ALL_PARSERS: List[BaseParser] = [
     ZshParser(),
     ShellDefaultsParser(),
     LinuxCommandsParser(),
+    GitCommandsParser(),
 ]
 
 
@@ -37,6 +39,7 @@ __all__ = [
     "ZshParser",
     "ShellDefaultsParser",
     "LinuxCommandsParser",
+    "GitCommandsParser",
     "ALL_PARSERS",
     "get_parser_for_file",
 ]

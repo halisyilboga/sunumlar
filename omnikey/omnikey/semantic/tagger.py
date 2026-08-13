@@ -121,7 +121,7 @@ SYNONYM_MAP: Dict[str, List[str]] = {
 
     # Structural Elements
     "workspace": ["calisma-alani", "çalışma-alanı", "alan", "workspace", "space", "proje", "project"],
-    "worktree": ["worktree", "git-dal", "calisma-agaci", "çalışma-ağacı", "dal", "branch", "repo"],
+    "worktree": ["worktree", "git-dal", "calisma-agaci", "çalışma-ağacı", "dal", "branch", "repo", "paralel"],
     "tab": ["sekme", "tab", "pencere", "sayfa"],
     "pane": ["panel", "bolme", "bölme", "pane", "bolum", "bölüm", "cerceve", "çerçeve"],
     "window": ["pencere", "window", "ekran"],
@@ -132,9 +132,26 @@ SYNONYM_MAP: Dict[str, List[str]] = {
     "resize": ["boyutlandir", "boyutlandır", "yeniden-boyutlandir", "resize", "scale"],
     "zoom": ["buyut", "büyüt", "odak", "zoom", "fullscreen", "tam-ekran"],
 
+    # Git Version Control Keywords
+    "git": ["git", "vcs", "versiyon", "kontrol", "depo", "repository", "commit", "branch", "dal"],
+    "branch": ["branch", "dal", "dallar", "dallanma", "checkout", "switch"],
+    "dal": ["branch", "dal", "dallar", "dallanma", "checkout", "switch"],
+    "stash": ["stash", "sakla", "gecici", "saklanan", "pop", "apply", "stashing", "kaydet"],
+    "sakla": ["stash", "sakla", "gecici", "kaydet", "save"],
+    "rebase": ["rebase", "tarihce", "duzenle", "squash", "fixup", "birlestir", "interactive"],
+    "cherry-pick": ["cherry-pick", "cherry", "pick", "al", "sec-al", "aktar", "uygula"],
+    "reflog": ["reflog", "kurtar", "recover", "kayip", "tarihce", "disaster", "undo"],
+    "revert": ["revert", "geri-al", "tersine-cevir", "iptal", "safe"],
+    "bisect": ["bisect", "hata", "hata-avla", "binary-search", "bug", "regresyon", "ara"],
+    "commit": ["commit", "kaydet", "amend", "duzenle", "sahne", "mesaj"],
+
     # AI & Agents
-    "agent": ["ajan", "ai", "yapay-zeka", "bot", "agent", "asistan", "assistant"],
-    "ai": ["yapay-zeka", "ai", "agent", "llm", "ajan"],
+    "agent": ["ajan", "ai", "yapay-zeka", "bot", "agent", "asistan", "assistant", "row", "satir"],
+    "ajan": ["agent", "ai", "yapay-zeka", "bot", "asistan", "assistant"],
+    "asistan": ["agent", "ai", "yapay-zeka", "bot", "asistan", "assistant"],
+    "ai": ["yapay-zeka", "ai", "agent", "llm", "ajan", "asistan"],
+    "notification": ["bildirim", "uyari", "notification", "target", "hedef", "alert"],
+    "bildirim": ["notification", "uyari", "alert", "hedef", "target"],
 
     # Files, Buffers, Editing
     "file": ["dosya", "dosyalar", "file", "files", "belge"],

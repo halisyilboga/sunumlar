@@ -6,16 +6,16 @@
 
 ## 📌 1. Yönetici Özeti (Executive Summary)
 
-**OmniKey**, modern terminal iş akışlarındaki tüm kısayol ve komut katmanlarını (`Herdr`, `Neovim / NvChad`, `Tmux`, `Zsh`, `Linux / Unix CLI Komutları`) tek bir merkezde toplayan, canlı takip eden ve çift dilli (Türkçe/İngilizce) doğal dil araması sunan akıllı bir CLI aracıdır.
+**OmniKey**, modern terminal iş akışlarındaki tüm kısayol ve komut katmanlarını (`Git`, `Herdr`, `Neovim / NvChad`, `Tmux`, `Zsh`, `Linux / Unix CLI Komutları`) tek bir merkezde toplayan, canlı takip eden ve çift dilli (Türkçe/İngilizce) doğal dil araması sunan akıllı bir CLI aracıdır.
 
 Bu review kapsamında denetlenecek temel alanlar:
 1. **Çift Dilli Doğal Dil ve Semantik Arama Motoru:** TR/EN sözlük, kök ayıklama (`strip_suffixes`), stop-word filtresi ve ağırlıklı puanlamalı sıralama (`relevancy scoring`).
-2. **Herdr Eksiksiz Hotkey & Panel/Worktree/Sekme Haritası:** `close_pane` (`prefix+x`), `remove_worktree` (`prefix+shift+x`), `split_vertical` (`prefix+v`), `split_horizontal` (`prefix+minus`), `zoom` (`prefix+z`), `new_tab` (`prefix+c`), `rename_pane` (`prefix+shift+p`), `cycle_pane_next` (`prefix+tab`), `previous/next workspace` (`prefix+p/n`), `agents` (`prefix+j/k`), `detach` (`prefix+d`) vb. eksiksiz yapılandırma.
-3. **NvChad Ekosistem Araçları & Anahtar Kelimeleri:** Telescope, NvimTree, LSP (Definition, Declaration, Hover, Rename, Code Actions, Diagnostics), Gitsigns (Hunks, Blame), Conform Formatter, Mason (LSP Installer), Lazy (Plugin Manager), Treesitter (Syntax), WhichKey, Minty (Color Picker), Tabufline ve Terminal araçlarının eksiksiz anahtar kelimelerle indekslenmesi (**382 toplam kayıt**).
-4. **Herdr & Tmux Resmi Standartları:** CLI komutları (`attach`, `list`, `kill`, `server`, `reload-config`) ve tüm varsayılan prefix tuşları.
-5. **Linux & CLI Cheat Sheet Modülü:** `locate`, `find`, `grep`, `lsof`, `kill -9`, `tar`, `chmod`, `rsync`, `ncdu`, `git stash` gibi 70+ kritik komut tarifinin sisteme entegrasyonu.
+2. **Git Bağımsız 1. Sınıf Araç Katmanı (`tool='git'`, `@git`, `Ctrl+G`):** Branching (`checkout -b`, `switch -c`, `-d`, `-D`), Stashing (`push`, `pop`, `apply`, `show -p`, `drop`), Rebase (`-i HEAD~N`, `--continue`, `--abort`), Geri Alma & Kurtarma (`reflog`, `reset --soft/hard/mixed`, `restore --staged`, `revert`), Cherry-Pick, Worktrees (`add`, `remove`, `list`), Bisect hata avı, Diff & Blame, Remotes & Tags olmak üzere **54 özel Git iş akışı**.
+3. **Genişletilmiş Linux & macOS Sistem Cheat Sheet Modülü (`tool='linux'`, `@linux`, `Ctrl+L`):** Süreç yönetimi (`kill -9`, `pkill`, `lsof -i :port`, `fuser`), disk/hafıza (`ncdu`, `df -h`, `du -sh`, `free -h`), servisler (`systemctl`, `journalctl -u -f`), arşivleme (`tar -czvf/-xzvf`, `zip/unzip`), ağ (`curl`, `rsync -avzP`, `dig`, `nc -zv`), izinler (`chmod`, `chown`) ve macOS araçları (`pbcopy`, `pbpaste`, `open .`, `caffeinate`) olmak üzere **76 sistem komut tarifi**.
+4. **Herdr Eksiksiz Hotkey & Panel/Worktree/Sekme Haritası:** `close_pane` (`prefix+x`), `remove_worktree` (`prefix+alt+x`), `split_vertical` (`prefix+v`), `split_horizontal` (`prefix+minus`), `zoom` (`prefix+z`), `new_tab` (`prefix+c`), `rename_pane` (`prefix+shift+p`), `cycle_pane_next` (`prefix+tab`), `previous/next workspace` (`prefix+p/n`), `agents` (`prefix+j/k`), `detach` (`prefix+d`) vb.
+5. **NvChad Ekosistem Araçları:** Telescope, NvimTree, LSP (Definition, Hover, Rename, Code Actions, Diagnostics), Gitsigns (Hunks, Blame), Conform Formatter, Mason, Lazy, Treesitter, WhichKey, Minty, Tabufline (**370 toplam kayıt, 26 unit test**).
 6. **Ekosistem Arayüzleri & Canlı Tool Filtreleri:**
-   - FZF içi anlık Tool Filtreleri: `Ctrl+A` (Hepsi), `Ctrl+L` (Linux), `Ctrl+N` (Neovim), `Ctrl+H` (Herdr), `Ctrl+T` (Tmux), `Ctrl+Z` (Zsh) ve `@linux`, `@nvim` etiketleri.
+   - FZF içi anlık Tool Filtreleri: `Ctrl+A` (Hepsi), `Ctrl+G` (Git), `Ctrl+L` (Linux), `Ctrl+H` (Herdr), `Ctrl+N` (Neovim), `Ctrl+T` (Tmux), `Ctrl+Z` (Zsh) ve `@git`, `@linux`, `@nvim`, `@herdr` etiketleri.
    - Neovim içi Telescope özel arama eklentisi (`<leader>sk`).
    - Zsh ZLE widget'ı (`Ctrl+Space`, `Alt+K`) ve CLI kısayolları (`ok`, `oks`, `oksy`, `oke`).
 7. **Otomatik Canlı Git Yedekleme (Hot Backup):** `sync`, `add`, `remove` veya arka plan izleyicisi (`watchdog`) tetiklendiğinde `omnikey_export.json` dosyasının otomatik güncellenmesi.

@@ -14,13 +14,19 @@ LINUX_RECIPES: List[Tuple[str, str, str, List[str]]] = [
         "nohup <komut> > cikti.log 2>&1 &",
         "nohup",
         "Komutu terminal kapansa bile arka planda çalıştırmaya devam et / Run command immune to hangups",
-        ["nohup", "arka-plan", "background", "surec", "kopma", "daemon"],
+        ["nohup", "arka-plan", "background", "surec", "kopma", "daemon", "async"],
     ),
     (
         "disown -a",
         "disown",
         "Tüm arka plan işlerini mevcut terminal kabuğundan ayır / Disown background jobs from shell",
         ["disown", "jobs", "arka-plan", "ayir", "detach"],
+    ),
+    (
+        "jobs -l",
+        "jobs",
+        "Mevcut kabukta çalışan arka plan işlerini ve PID numaralarını listele / List background jobs with PIDs",
+        ["jobs", "arka-plan", "list", "pid", "surecler", "arkaplan"],
     ),
 
     # --- File Finding & Search ---
@@ -55,15 +61,21 @@ LINUX_RECIPES: List[Tuple[str, str, str, List[str]]] = [
         ["find", "delete", "sil", "temizle", "tmp", "dosya"],
     ),
     (
+        "find . -type f -name '*.txt' -exec grep -H 'aranan' {} +",
+        "find",
+        "Belirli dosya türlerinde toplu arama yap / Find files and grep inside them",
+        ["find", "exec", "grep", "toplu", "metin", "ara", "arama"],
+    ),
+    (
         "fd -e py",
         "fd",
         "Uzantıya göre hızlı dosya ara (fd-find) / Fast file search by extension using fd",
         ["fd", "find", "extension", "uzanti", "dosya", "ara", "bul"],
     ),
     (
-        "grep -rn 'aranan_metin' .",
+        "grep -rnI 'aranan_metin' .",
         "grep",
-        "Dizin içindeki tüm dosyalarda metin ara / Recursively search text in files",
+        "İkili (binary) dosyaları atlayarak dizinde metin ara / Search text recursively skipping binary",
         ["grep", "metin", "ara", "bul", "search", "text", "string", "icerik"],
     ),
     (
@@ -77,6 +89,18 @@ LINUX_RECIPES: List[Tuple[str, str, str, List[str]]] = [
         "which",
         "Komutun çalıştırılabilir ikili dosya yolunu göster / Locate executable binary in PATH",
         ["which", "nerede", "path", "binary", "komut", "yol"],
+    ),
+    (
+        "ln -s <hedef_dosya> <link_adi>",
+        "ln",
+        "Sembolik bağlantı (Soft Symbolic Link) oluştur / Create symbolic soft link",
+        ["ln", "link", "sembolik", "soft", "kisayol", "baglanti"],
+    ),
+    (
+        "tree -L 2",
+        "tree",
+        "Dizin ağacını 2 seviye derinlikle görselleştir / Display directory tree up to depth 2",
+        ["tree", "agac", "dizin", "gorsel", "yapi", "klasor"],
     ),
 
     # --- Text & Log Inspection ---
@@ -119,192 +143,222 @@ LINUX_RECIPES: List[Tuple[str, str, str, List[str]]] = [
     (
         "sort <dosya.txt> | uniq -c | sort -nr",
         "uniq",
-        "Tekrarlayan satırları say ve en çoktan aza sırala / Count unique lines sorted by frequency",
-        ["uniq", "sort", "tekrar", "sirala", "say", "count"],
+        "Satırları say, tekilleştir ve en çok tekrarlanana göre sırala / Count and sort unique occurrences",
+        ["sort", "uniq", "say", "sirala", "tekil", "tekrar", "analiz"],
     ),
     (
         "wc -l <dosya.txt>",
         "wc",
         "Dosyadaki toplam satır sayısını say / Count total lines in file",
-        ["wc", "satir", "say", "count", "line"],
+        ["wc", "satir", "say", "line", "count", "adet"],
     ),
     (
-        "jq '.' <veri.json>",
-        "jq",
-        "JSON çıktısını renklendir ve biçimlendir / Pretty-print and format JSON data",
-        ["jq", "json", "format", "renk", "parse", "biçimlendir"],
+        "cut -d',' -f1,3 <veri.csv>",
+        "cut",
+        "CSV veya sınırlandırılmış metinden belirli alanları kes / Cut delimited columns",
+        ["cut", "csv", "ayir", "kes", "kolon", "alan"],
     ),
     (
         "diff -u <dosya1> <dosya2>",
         "diff",
-        "İki dosya arasındaki farkları Unified Diff olarak göster / Compare two files line by line",
-        ["diff", "fark", "karsilastir", "compare"],
+        "İki dosya arasındaki farkları birleşik (unified) formatta göster / Show unified diff between files",
+        ["diff", "fark", "karsilastir", "dosyalar", "compare"],
     ),
 
-    # --- Processes, Ports & System ---
-    (
-        "lsof -i :8080",
-        "lsof",
-        "Belirtilen portu (8080) kullanan süreci ve PID'yi bul / Find process listening on port",
-        ["lsof", "port", "pid", "process", "surec", "dinleyen", "portu", "bul", "net"],
-    ),
-    (
-        "kill -9 $(lsof -t -i :8080)",
-        "kill",
-        "Portu kullanan süreci doğrudan öldür / Force kill process using specified port",
-        ["kill", "port", "oldur", "öldür", "sonlandir", "sonlandır", "terminate", "lsof"],
-    ),
+    # --- Process Management & Killing ---
     (
         "ps aux | grep <isim>",
         "ps",
-        "Çalışan süreçleri filtrele / Filter running processes by name",
-        ["ps", "process", "surec", "calisan", "grep", "list", "pid"],
+        "Çalışan süreçleri isme göre filtrele / Filter running processes by name",
+        ["ps", "surec", "process", "filtre", "ara", "calisan", "grep"],
     ),
     (
-        "killall -9 <program_adi>",
-        "killall",
-        "Bir programın tüm açık süreçlerini zorla kapat / Kill all process instances by name",
-        ["killall", "kill", "oldur", "kapat", "program", "surec"],
+        "pgrep -l <isim>",
+        "pgrep",
+        "İsme göre çalışan süreçlerin PID ve adlarını listele / List process IDs and names",
+        ["pgrep", "pid", "surec", "bul", "process", "id"],
     ),
     (
-        "pkill -f <kelime>",
+        "kill -9 <PID>",
+        "kill",
+        "Belirtilen PID'ye zorla sonlandırma (SIGKILL) sinyali gönder / Force kill process by PID",
+        ["kill", "oldur", "kapat", "sonlandir", "pid", "sigkill", "force"],
+    ),
+    (
+        "pkill -9 -f <isim>",
         "pkill",
-        "Komut satırında eşleşen tüm süreçleri öldür / Kill processes matching pattern",
-        ["pkill", "kill", "surec", "oldur"],
+        "Komut satırında isim geçen tüm süreçleri zorla kapat / Force kill all processes matching name",
+        ["pkill", "toplu", "kapat", "oldur", "sonlandir", "isim", "surec"],
+    ),
+    (
+        "killall <uygulama>",
+        "killall",
+        "Belirtilen ada sahip tüm uygulamaları kapat / Kill all processes by application name",
+        ["killall", "kapat", "surec", "uygulama", "hepsi"],
+    ),
+    (
+        "lsof -i :<port>",
+        "lsof",
+        "Belirtilen portu kullanan süreci ve PID numarasını bul / Find process holding open port",
+        ["lsof", "port", "pid", "hangi", "kullanan", "surec", "dinleyen"],
+    ),
+    (
+        "fuser -k <port>/tcp",
+        "fuser",
+        "Belirtilen TCP portunu kilitleyen süreci doğrudan öldür / Kill process listening on TCP port",
+        ["fuser", "port", "kill", "oldur", "kapat", "tcp"],
+    ),
+    (
+        "top",
+        "top",
+        "Canlı sistem kaynakları ve süreç monitörü / Interactive real-time process monitor",
+        ["top", "monitor", "cpu", "ram", "kaynak", "surecler"],
     ),
     (
         "htop",
         "htop",
-        "İnteraktif süreç ve sistem kaynak monitörü / Interactive system and CPU/RAM monitor",
-        ["htop", "top", "cpu", "ram", "bellek", "kaynak", "monitor", "surec"],
+        "Gelişmiş renkli ve interaktif süreç yöneticisi / Interactive colorful process viewer",
+        ["htop", "monitor", "surec", "cpu", "ram", "yonetici"],
     ),
 
-    # --- Disk, Hardware & Storage ---
-    (
-        "du -sh * | sort -h",
-        "du",
-        "Mevcut dizindeki klasör boyutlarını sıralı göster / Show directory sizes sorted",
-        ["du", "disk", "boyut", "size", "klasor", "yer", "kaplayan", "alan"],
-    ),
+    # --- Disk & Memory Inspection ---
     (
         "df -h",
         "df",
-        "Disk bölümlerinin doluluk oranlarını göster / Check disk space and free capacity",
-        ["df", "disk", "kapasite", "doluluk", "bos", "alan", "storage"],
+        "Tüm disk bölümlerinin boş/dolu alan durumunu insan okunur göster / Show disk filesystem usage",
+        ["df", "disk", "alan", "bos", "dolu", "gb", "hafiza", "storage"],
+    ),
+    (
+        "du -sh * | sort -h",
+        "du",
+        "Mevcut klasördeki tüm dizinlerin boyutlarını hesapla ve sırala / Calculate directory disk usage",
+        ["du", "boyut", "yer", "kaplayan", "klasor", "sirala", "disk"],
     ),
     (
         "ncdu",
         "ncdu",
         "Görsel interaktif disk kullanım analizörü / Interactive NCurses disk usage analyzer",
-        ["ncdu", "disk", "analiz", "temizle", "boyut", "large", "alan"],
+        ["ncdu", "disk", "analiz", "gorsel", "temizle", "yer"],
     ),
     (
         "free -h",
         "free",
-        "RAM ve Swap bellek kullanım durumunu göster / Display free and used memory in human units",
-        ["free", "ram", "bellek", "memory", "swap", "alan"],
+        "RAM ve Swap bellek kullanımını insan okunur göster / Display free and used memory in human units",
+        ["free", "ram", "bellek", "hafiza", "swap", "memory"],
     ),
     (
-        "uname -a",
-        "uname",
-        "İşletim sistemi çekirdek ve mimari bilgilerini göster / Print system information and kernel",
-        ["uname", "os", "sistem", "kernel", "cekirdek", "surum"],
+        "lsblk",
+        "lsblk",
+        "Tüm blok depolama cihazlarını ve bölümlerini listele / List block storage devices and partitions",
+        ["lsblk", "disk", "bolum", "part", "depolama", "surucu"],
     ),
 
-    # --- Service Management (systemd & macOS) ---
+    # --- Systemd Services & Logs ---
     (
         "systemctl status <servis>",
         "systemctl",
-        "Sistem servisinin çalışma durumunu incele / Check systemd service status",
-        ["systemctl", "servis", "service", "status", "durum", "systemd"],
+        "Sistem servisinin çalışma durumunu göster / Show systemd service status",
+        ["systemctl", "servis", "service", "durum", "status", "daemon"],
     ),
     (
         "sudo systemctl restart <servis>",
         "systemctl",
         "Sistem servisini yeniden başlat / Restart systemd service",
-        ["systemctl", "servis", "restart", "yeniden", "baslat"],
+        ["systemctl", "restart", "yeniden", "baslat", "servis"],
     ),
     (
-        "journalctl -u <servis> -f -n 50",
+        "sudo systemctl enable --now <servis>",
+        "systemctl",
+        "Servisi açılışta otomatik başlayacak şekilde etkinleştir ve hemen başlat / Enable and start service",
+        ["systemctl", "enable", "start", "acilis", "etkinlestir", "servis"],
+    ),
+    (
+        "journalctl -u <servis> -f",
         "journalctl",
-        "Servise ait logları canlı olarak takip et / Follow service journal logs in real-time",
-        ["journalctl", "log", "servis", "canli", "takip", "systemd"],
+        "Sistem servisinin loglarını canlı olarak akışta izle / Follow systemd service logs live",
+        ["journalctl", "log", "servis", "canli", "takip", "izle", "hata"],
     ),
     (
-        "brew services list",
-        "brew",
-        "macOS Homebrew servislerinin durumunu listele / List Homebrew background services",
-        ["brew", "services", "servisler", "macos", "liste"],
-    ),
-    (
-        "brew services restart <servis>",
-        "brew",
-        "macOS Homebrew servisini yeniden başlat / Restart Homebrew service",
-        ["brew", "services", "restart", "yeniden", "baslat"],
+        "journalctl -xe",
+        "journalctl",
+        "En son sistem hatalarını ve açıklamalarını detaylı göster / View recent system error journals",
+        ["journalctl", "hata", "error", "sistem", "log", "detay"],
     ),
 
     # --- Archives & Compression ---
     (
-        "tar -czvf arsiv.tar.gz <dizin>",
+        "tar -czvf <arsiv.tar.gz> <dizin>/",
         "tar",
-        "Bir dizini tar.gz formatında sıkıştır / Compress directory into tar.gz archive",
-        ["tar", "compress", "sikistir", "sıkıştır", "arsiv", "arşiv", "zip", "gz"],
+        "Dizini sıkıştırarak .tar.gz arşivi oluştur / Create compressed tar.gz archive",
+        ["tar", "arsiv", "sikistir", "yedek", "paketle", "targz", "gzip"],
     ),
     (
-        "tar -xzvf arsiv.tar.gz",
+        "tar -xzvf <arsiv.tar.gz>",
         "tar",
-        "tar.gz arşivini geçerli dizine aç / Extract tar.gz archive into current folder",
-        ["tar", "extract", "ac", "aç", "cikar", "çıkar", "arsiv", "unzip"],
+        ".tar.gz arşivini mevcut dizine aç / Extract tar.gz archive",
+        ["tar", "ac", "cikar", "extract", "arsiv", "targz"],
     ),
     (
-        "tar -tvf arsiv.tar.gz",
+        "tar -tf <arsiv.tar.gz>",
         "tar",
-        "Arşivi açmadan içindeki dosya listesini incele / List contents of tar.gz archive without extracting",
-        ["tar", "list", "incele", "arsiv", "icerik"],
+        "Arşivi açmadan içindeki dosya listesini görüntüle / List contents of tar archive without extracting",
+        ["tar", "list", "incele", "icerik", "dosyalar"],
     ),
     (
-        "unzip dosya.zip -d <hedef_dizin>",
-        "unzip",
-        "Zip dosyasını belirtilen hedef dizine aç / Extract zip archive to target directory",
-        ["unzip", "zip", "ac", "aç", "cikar", "arsiv", "extract"],
-    ),
-    (
-        "zip -r arsiv.zip <dizin>",
+        "zip -r <arsiv.zip> <dizin>/",
         "zip",
-        "Dizini zip olarak sıkıştır / Create recursive zip archive",
-        ["zip", "compress", "sikistir", "arsiv"],
+        "Klasörü özyinelemeli olarak .zip arşivi yap / Create zip archive recursively",
+        ["zip", "sikistir", "arsiv", "klasor", "paketle"],
+    ),
+    (
+        "unzip <arsiv.zip>",
+        "unzip",
+        ".zip arşivini mevcut dizine çıkar / Extract zip archive",
+        ["unzip", "ac", "cikar", "extract", "zip"],
+    ),
+    (
+        "gzip -d <dosya.gz>",
+        "gzip",
+        ".gz sıkıştırılmış dosyasını aç / Decompress .gz file",
+        ["gzip", "gunzip", "ac", "sikistirma", "decompress"],
     ),
 
-    # --- Permissions & Ownership ---
+    # --- Permissions, Users & Ownership ---
     (
-        "chmod +x <dosya>",
+        "chmod +x <script.sh>",
         "chmod",
-        "Dosyaya çalıştırma yetkisi ver / Make file executable",
-        ["chmod", "yetki", "izin", "execute", "calistir", "çalıştır", "permission"],
+        "Dosyaya çalıştırma yetkisi (executable) ver / Make file executable",
+        ["chmod", "calistirma", "yetki", "executable", "script", "izin"],
     ),
     (
-        "chmod -R 755 <dizin>",
+        "chmod 755 <dizin>/",
         "chmod",
-        "Klasör ve alt dosyalarına standart okuma/yazma/çalıştırma izni ver / Set standard permissions",
-        ["chmod", "izin", "permission", "755", "yetki"],
+        "Dizine standart rwxr-xr-x (755) izinlerini ata / Set standard directory permissions",
+        ["chmod", "755", "izin", "yetki", "dizin", "klasor"],
     ),
     (
-        "chmod 600 ~/.ssh/id_rsa",
+        "chmod 644 <dosya>",
         "chmod",
-        "SSH özel anahtarına sadece sahip erişim izni ver / Set secure SSH key permissions",
-        ["chmod", "ssh", "600", "izin", "guvenlik"],
+        "Dosyaya standart rw-r--r-- (644) izinlerini ata / Set standard file permissions",
+        ["chmod", "644", "izin", "yetki", "dosya"],
     ),
     (
-        "chown -R $USER:$USER <dizin>",
+        "sudo chown -R $USER:$USER <dizin>/",
         "chown",
-        "Dizinin sahipliğini mevcut kullanıcıya ata / Change recursive ownership to current user",
-        ["chown", "sahip", "owner", "user", "kullanici", "yetki"],
+        "Dizinin ve altındaki tüm dosyaların sahipliğini mevcut kullanıcıya ata / Recursive chown to current user",
+        ["chown", "sahip", "owner", "user", "kullanici", "yetki", "sahiplik"],
     ),
     (
         "sudo !!",
         "sudo",
         "Son çalıştırılan komutu sudo (root) yetkisiyle tekrar çalıştır / Rerun last command with sudo",
         ["sudo", "yetki", "root", "tekrar", "son"],
+    ),
+    (
+        "whoami && id",
+        "whoami",
+        "Mevcut oturum açmış kullanıcıyı ve grup ID'lerini göster / Show current user and group memberships",
+        ["whoami", "id", "kullanici", "user", "gruplar"],
     ),
 
     # --- Network, Download & Transfer ---
@@ -325,6 +379,12 @@ LINUX_RECIPES: List[Tuple[str, str, str, List[str]]] = [
         "curl",
         "JSON gövdeli HTTP POST isteği gönder / Send HTTP POST request with JSON payload",
         ["curl", "post", "json", "api", "istek", "http"],
+    ),
+    (
+        "curl ifconfig.me",
+        "curl",
+        "Dış dünyaya açık genel (Public) IP adresini sorgula / Query public external IP address",
+        ["curl", "ip", "public", "dis-ip", "adres", "sorgula"],
     ),
     (
         "wget -c <url>",
@@ -374,67 +434,61 @@ LINUX_RECIPES: List[Tuple[str, str, str, List[str]]] = [
         "Uzak sunucudaki portun açık olup olmadığını test et / Test if remote port is open",
         ["nc", "netcat", "port", "test", "kontrol", "ag", "open"],
     ),
+    (
+        "ping -c 4 <host>",
+        "ping",
+        "Hedef sunucuya 4 adet ICMP paketi göndererek erişilebilirliği test et / Test host reachability with ping",
+        ["ping", "test", "erisim", "ag", "network", "gecikme", "latency"],
+    ),
 
-    # --- Git Master Recipes ---
+    # --- System Info, Environment & macOS ---
     (
-        "git reset --soft HEAD~1",
-        "git",
-        "Son commit'i geri al fakat kod değişikliklerini koru (Staged) / Undo last commit keep changes",
-        ["git", "commit", "geri", "al", "reset", "undo", "soft"],
+        "uname -a",
+        "uname",
+        "İşletim sistemi çekirdek (Kernel) ve mimari bilgisini göster / Show OS kernel and architecture",
+        ["uname", "kernel", "os", "surum", "mimari", "cekirdek"],
     ),
     (
-        "git reset --hard HEAD",
-        "git",
-        "Mevcut tüm stage edilmemiş ve yerel değişiklikleri sıfırla / Discard all local uncommitted changes",
-        ["git", "reset", "hard", "sifirla", "geri-al", "temizle"],
+        "uptime -p",
+        "uptime",
+        "Sistemin ne kadar süredir açık olduğunu göster / Show system uptime",
+        ["uptime", "acik", "sure", "sistem", "calisma"],
     ),
     (
-        "git stash && git stash pop",
-        "git",
-        "Değişiklikleri geçici olarak sakla ve geri yükle / Stash work in progress and restore",
-        ["git", "stash", "sakla", "pop", "gecici", "kaydet"],
+        "env | grep <degisken>",
+        "env",
+        "Ortam değişkenlerini (Environment variables) listele ve filtrele / Filter environment variables",
+        ["env", "degisken", "ortam", "export", "path"],
     ),
     (
-        "git commit --amend --no-edit",
-        "git",
-        "Son commit mesajını değiştirmeden yeni stage edilen dosyaları son commit'e ekle / Amend last commit",
-        ["git", "commit", "amend", "birlestir", "ekle", "guncelle"],
+        "pbcopy < <dosya.txt>",
+        "pbcopy",
+        "Dosya içeriğini doğrudan panoya kopyala (macOS) / Copy file contents to clipboard",
+        ["pbcopy", "pano", "kopyala", "clipboard", "macos", "copy"],
     ),
     (
-        "git branch -D <dal_adi>",
-        "git",
-        "Birleştirilmemiş bir Git dalını zorla sil / Force delete branch",
-        ["git", "branch", "dal", "sil", "delete", "remove"],
+        "pbpaste > <dosya.txt>",
+        "pbpaste",
+        "Panodaki metni dosyaya yapıştır (macOS) / Paste clipboard contents to file",
+        ["pbpaste", "yapistir", "pano", "clipboard", "macos", "paste"],
     ),
     (
-        "git log --oneline --graph --all",
-        "git",
-        "Tüm dalların commit geçmişini görsel ağaç grafiğiyle göster / Pretty git log graph",
-        ["git", "log", "graph", "agac", "gecmis", "dallar"],
+        "caffeinate -d",
+        "caffeinate",
+        "Terminal açıkken bilgisayarın uyku moduna geçmesini engelle (macOS) / Prevent display sleep",
+        ["caffeinate", "uyku", "sleep", "engelle", "uyanik", "macos"],
     ),
     (
-        "git diff --staged",
-        "git",
-        "Commit edilecek (stage edilmiş) değişiklikleri incele / View staged differences",
-        ["git", "diff", "fark", "staged", "incele", "degisiklik"],
-    ),
-    (
-        "git cherry-pick <commit_hash>",
-        "git",
-        "Başka daldaki belirli bir commit'i mevcut dala uygula / Apply specific commit to current branch",
-        ["git", "cherry-pick", "commit", "uygula", "al"],
-    ),
-    (
-        "git clean -fd",
-        "git",
-        "Git tarafından takip edilmeyen tüm sahipsiz dosya ve dizinleri sil / Clean untracked files",
-        ["git", "clean", "temizle", "sil", "untracked"],
+        "open .",
+        "open",
+        "Mevcut dizini macOS Finder veya varsayılan dosya yöneticisinde aç / Open current directory in Finder",
+        ["open", "finder", "dizin", "klasor", "ac", "macos"],
     ),
 ]
 
 
 class LinuxCommandsParser(BaseParser):
-    """Parser & loader for essential Linux/Unix terminal recipes and cheat sheet."""
+    """Parser & loader for essential Linux/Unix/macOS terminal recipes and cheat sheet."""
 
     @property
     def tool_name(self) -> str:
@@ -458,7 +512,7 @@ class LinuxCommandsParser(BaseParser):
                 description=desc,
                 mode="cli",
             )
-            tags.extend(["linux", "cli", "shell", "bash", "zsh", "terminal", "command", "komut", tool_category])
+            tags.extend(["linux", "unix", "macos", "cli", "shell", "bash", "zsh", "terminal", "command", "komut", tool_category])
             tags.extend(custom_tags)
             clean_tags = sorted(list(set(t.strip().lower() for t in tags if len(t.strip()) >= 2)))
 
