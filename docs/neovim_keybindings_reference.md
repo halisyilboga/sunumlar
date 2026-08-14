@@ -47,7 +47,6 @@ Bu belge, modern bir Neovim geliştirme ortamında (NvChad / LazyVim / Standart 
 | `n` | `<leader>fb` | `Telescope buffers` | Açık tamponları (buffers) listele |
 | `n` | `<leader>fo` | `Telescope oldfiles` | Son açılan dosyalar |
 | `n` | `<leader>fh` | `Telescope help_tags` | Yardım etiketlerini ara |
-| `n` | `<leader>sk` | `require('omnikey').search_keybindings` | **OmniKey ile tüm sistem kısayollarını ara** |
 
 ---
 

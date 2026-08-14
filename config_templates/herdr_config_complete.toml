@@ -83,10 +83,3 @@ type = "popup"
 command = "lazygit"
 width = "85%"
 height = "85%"
-
-[[keys.command]]
-key = "prefix+alt+k"
-type = "popup"
-command = "omnikey search"
-width = "80%"
-height = "80%"

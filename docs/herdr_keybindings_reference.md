@@ -129,12 +129,4 @@ type = "popup"
 command = "btop"
 width = "80%"
 height = "80%"
-
-# OmniKey Kısayol Arama Pop-up
-[[keys.command]]
-key = "prefix+alt+k"
-type = "popup"
-command = "omnikey search"
-width = "75%"
-height = "75%"
 ```

@@ -29,16 +29,6 @@ map("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Açık tamponlar�
 map("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", { desc = "Yardım etiketlerini ara" })
 map("n", "<leader>fo", "<cmd>Telescope oldfiles<cr>", { desc = "Son açılan dosyaları listele" })
 
--- 4. OmniKey Sistem Genel Kısayol Arama Entegrasyonu
-map("n", "<leader>sk", function()
-  local ok, omnikey = pcall(require, "omnikey.integrations.omnikey")
-  if ok then
-    omnikey.search_keybindings()
-  else
-    vim.notify("OmniKey Telescope uzantısı yüklenemedi", vim.log.levels.WARN)
-  end
-end, { desc = "OmniKey ile tüm sistem kısayollarını ara" })
-
 -- 5. Dosya Gezgini (NvimTree) & Lazygit
 map("n", "<C-n>", "<cmd>NvimTreeToggle<cr>", { desc = "Dosya ağacını aç/kapat (NvimTree)" })
 map("n", "<leader>e", "<cmd>NvimTreeToggle<cr>", { desc = "Dosya ağacını aç/kapat" })
