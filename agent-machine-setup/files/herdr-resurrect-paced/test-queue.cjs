@@ -1,0 +1,11 @@
+'use strict';
+const assert=require('node:assert/strict');const h=require('./lib/herdr');const {StartupQueue}=require('./lib/startup-queue');
+let now=0, polls=0;h.agentList=()=>[{pane_id:'w1:p1',agent:'opencode',agent_status:++polls<3?'working':'idle'}];
+const q=new StartupQueue({startupDelayMs:10000,startupReadyTimeoutMs:2000,clock:()=>now,sleep:n=>{now+=n;}});q.started();q.waitReady('w1:p1',{name:'opencode'});assert.equal(now,1000);q.beforeStart();assert.equal(now,10000);
+h.agentList=()=>[];assert.throws(()=>q.waitReady('w1:p2',{name:'opencode'}),/not ready after 2000ms/);assert.equal(now,12000);
+const {sessionFromArgv}=require('./lib/snapshot');
+assert.equal(sessionFromArgv('opencode','opencode --session ses_abc123').value,'ses_abc123');
+assert.equal(sessionFromArgv('kilo','kilo -s ses_def123').value,'ses_def123');
+const {commandFor}=require('./lib/restore');assert.equal(commandFor({agent:{name:'opencode'}}),null);
+const fs=require('fs');const path=require('path');const os=require('os');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'herdr-lock-test-'));const file=path.join(dir,'lease');const lock=require('./lib/queue-lock');assert.ok(lock.acquire(file));assert.equal(lock.acquire(file),false);lock.release(file);assert.ok(lock.acquire(file));lock.release(file);fs.rmSync(dir,{recursive:true});
+console.log('PASS: readiness wait, launch spacing, timeout stops queue, session capture, missing ID guard, exclusive lease');

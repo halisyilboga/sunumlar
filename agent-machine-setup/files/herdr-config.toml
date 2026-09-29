@@ -1,0 +1,85 @@
+onboarding = false
+
+[ui]
+show_agent_labels_on_pane_borders = true
+# "spaces" = Çalışma alanlarına göre sabit ve öngörülebilir sıra (Workspace 1 -> 2 -> 3)
+agent_panel_sort = "priority"
+
+[ui.toast]
+delivery = "off"
+
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+[experimental]
+pane_history = false
+
+[keys]
+
+# --- AI Ajan Navigasyonu (Varsayılanda tanımsızdı - eklendi) ---
+next_agent = "prefix+j"
+previous_agent = "prefix+k"
+focus_agent = "prefix+alt+1..9"
+
+# --- Çalışma Alanı / Proje Navigasyonu (Varsayılanda tanımsızdı - eklendi) ---
+previous_workspace = "prefix+["
+next_workspace = "prefix+]"
+switch_workspace = "prefix+shift+1..9"
+
+# --- Git Worktree Operasyonları (Varsayılanda tanımsızdı - eklendi) ---
+open_worktree = "prefix+shift+o"
+remove_worktree = "prefix+alt+x"
+
+# --- Panel Odaklanma Çakışmasını Önleme (j/k ajanlara ayrıldığı için yön tuşları panellere atandı) ---
+focus_pane_left = "prefix+left"
+focus_pane_right = "prefix+right"
+focus_pane_up = "prefix+up"
+focus_pane_down = "prefix+down"
+last_pane = "prefix+l"
+
+# --- Özel Popup Komutları ---
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "lazygit"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+alt+b"
+type = "popup"
+command = "btop"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+alt+d"
+type = "popup"
+command = "lazydocker"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+alt+y"
+type = "popup"
+command = "yazi"
+width = "85%"
+height = "85%"
+
+# --- herdr-resurrect: snapshot kaydet / geri yükle ---
+[[keys.command]]
+key = "prefix+ctrl+s"
+type = "plugin_action"
+command = "ntindle.herdr-resurrect.save"
+description = "resurrect: save"
+
+[[keys.command]]
+key = "prefix+ctrl+r"
+type = "plugin_action"
+command = "ntindle.herdr-resurrect.restore"
+description = "resurrect: restore"
+
+# Agent launches are owned by the paced resurrect queue.
+[session]
+resume_agents_on_restore = false
