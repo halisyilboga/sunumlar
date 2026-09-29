@@ -1,8 +1,10 @@
+#!/bin/bash
+# Ubuntu (amd64) Webtop masaüstünü Docker'da açar ve içine Codex CLI kurar.
 docker rm -f webtop 2>/dev/null; \
   docker run -d --name webtop \
     --platform=linux/amd64 \
     -p 3333:3000 \
-    -e PUID=$(id -u) -e PGID=$(id -g) -e TZ=Europe/Istanbul \
+    -e PUID="$(id -u)" -e PGID="$(id -g)" -e TZ=Europe/Istanbul \
     -e SELKIES_MANUAL_WIDTH=1920 \
     -e SELKIES_MANUAL_HEIGHT=1080 \
     -e SELKIES_IS_MANUAL_RESOLUTION_MODE=true \
@@ -15,20 +17,16 @@ docker rm -f webtop 2>/dev/null; \
     apt-get install -y nodejs && npm install -g @openai/codex' && \
   echo "STABLE 1080p Webtop Ubuntu VM Ready at http://localhost:3333"
 
+exit 0
 
-
-
-  # https://tmailor.com/ 
-  # https://temp-mail.org/
-  # Asdfg1234**.
-
-  cp -r ~/.codex ~/codexler/.codex.backup1 2>/dev/null || true
-
-  docker cp webtop:/config/.codex ~/codexler/.codex.backup2
------ 
-# sonrasi icin:
-  rm -rf ~/.codex
-  cp -r ~/codexler/.codex.backup2 ~/.codex
-
-
-   docker cp webtop:/config/.windsurf ~/windsurf/.windsurf.backup2
+# --- Notlar (elle çalıştırılır; betik buraya kadar gelmez) -------------------
+# Geçici e-posta: https://tmailor.com/  https://temp-mail.org/
+#
+# Yedek al:
+#   cp -r ~/.codex ~/codexler/.codex.backup1 2>/dev/null || true
+#   docker cp webtop:/config/.codex ~/codexler/.codex.backup2
+#   docker cp webtop:/config/.windsurf ~/windsurf/.windsurf.backup2
+#
+# Sonrası için (DİKKAT: ~/.codex'i siler, önce yedeğin var olduğundan emin ol):
+#   rm -rf ~/.codex
+#   cp -r ~/codexler/.codex.backup2 ~/.codex
