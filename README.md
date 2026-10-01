@@ -22,6 +22,23 @@ Proje, hem insanlar hem de AI ajanları tarafından kolayca navigasyon yapılabi
 └── maindocs/               # Birleştirilmiş ana dökümantasyon
 ```
 
+## 🔌 VPN / Proxy Yönetimi
+
+VPN (Tunnelblick) açıkken SSH proxy tünellerini otomatik kuran, kapanınca
+kapan tümü tek yönetici: **`./vpn_proxy.sh`**
+
+```bash
+./vpn_proxy.sh          # menü
+./vpn_proxy.sh status   # VPN + proxy durumu
+```
+
+> **Bu sistemi değiştirmek istiyorsan önce `docs/vpn_proxy.md` dosyasının
+> "GÜNCELLEME REHBERİ" bölümünü oku.** Hangi dosyanın güncelleneceği, hangi
+> dosyaya dokunulmayacağı ve değişiklikten sonra ne söyleneceği orada yazılı.
+>
+> Kısaca: mantık → `vpn_proxy.sh`, model sync → `sync_proxy_models.js`,
+> eski kodlar → `legacy/v1/` (**dokunma**).
+
 ## 🚀 Sunumları Çalıştırma (Quarto)
 
 Bu proje [Quarto CLI](https://quarto.org/docs/get-started/) kullanılarak derlenir.

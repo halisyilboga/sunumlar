@@ -14,6 +14,13 @@ FREEZE_ENABLED="${FREEZE_ENABLED:-0}"
 IDLE_FREEZE_AFTER=600
 AGENT_PATTERN='opencode|claude|kilocode/cli-darwin-arm64/bin/kilo'
 
+# VPN geldiğinde SSH proxy'lerini (opencode/cline/kilo/antigravity) otomatik
+# kur. Tek giriş noktası proxy_login.sh; parola ~/.config/sunumlar/secrets.env
+# içinde saklanır, VPN yoksa daemon bekler.
+AUTO_PROXY="${AUTO_PROXY:-1}"
+PROXY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROXY_LOGIN="$PROXY_DIR/proxy_login.sh"
+
 LAST_STATE="unknown"
 FREEZE_STATE="active"
 LAST_HEARTBEAT=0
@@ -197,11 +204,20 @@ while true; do
   IFS='|' read -r TB_STATE TS_STATE OTHER_STATE <<< "$CURRENT_STATE"
 
   if [ "$TB_STATE" != "down" ] || [ "$TS_STATE" != "down" ] || [ "$OTHER_STATE" != "down" ]; then
+    VPN_UP=1
     [ "$CURRENT_STATE" != "$LAST_STATE" ] && log "VPN BAĞLANDI [$CURRENT_STATE] ($(get_vpn_detail)) - caffeinate başlatılıyor"
     if [ -z "$CAFFEINATE_PID" ] || ! kill -0 "$CAFFEINATE_PID" 2>/dev/null; then
       caffeinate -i -t 3600 &
       CAFFEINATE_PID=$!
       log "Caffeinate başlatıldı (PID: $CAFFEINATE_PID)"
+    fi
+    # VPN YENİDEN bağlandığında proxy'leri kur. Sadece durum değişiminde
+    # tetiklenir (her poll'da değil) — VPN'sız geçen sürelerde de toparlanır.
+    if [ "$AUTO_PROXY" = "1" ] && [ -x "$PROXY_LOGIN" ] \
+       && { [ "$LAST_STATE" = "down|down|down" ] || [ -z "$LAST_STATE" ]; }; then
+      log "VPN geldi - SSH proxy'leri kuruluyor (proxy_login.sh)"
+      bash "$PROXY_LOGIN" connect >>"$PROXY_DIR/vpn_caffeinate_manager.log" 2>&1 \
+        && log "Proxy'ler kuruldu" || log "Proxy kurulumu sıkıntılı - vpn_caffeinate_manager.log'a bakın"
     fi
   else
     [ "$CURRENT_STATE" != "$LAST_STATE" ] && log "VPN KESİLDİ [$CURRENT_STATE] ($(get_vpn_detail)) - caffeinate durduruluyor"
