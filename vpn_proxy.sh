@@ -127,7 +127,24 @@ save_password() {
 }
 
 # -----------------------------------------------
-# VPN algılama (vpn_caffeinate_manager.sh mantığı)
+# VPN algılama — HERHANGİ BİR VPN
+# -----------------------------------------------
+# Tasarım: hiçbir VPN istemcisine (Tunnelblick/Forti/Tailscale/...) bağlı
+# değiliz. VPN'ler iki yoldan görünür ve ikisi de sınanır:
+#
+#   1) macOS SİSTEM VPN SERVİSLERİ — `scutil --nc list`
+#      IKEv2/IPsec/PPTP, Tailscale, FortiClient, BlancVPN vb. burada
+#      "Connected" olarak görünür.
+#   2) VPN SÜREÇLERİ — openvpn, openvpn3, wireguard-go, tailscaled, ...
+#      Tunnelblick gibi kendini sistem servisi olarak kaydetmeyen istemciler
+#      yalnızca süreç üzerinden görünür.
+#
+# İkisi de yoksa ama etkin bir utun varsa onu da kabul ederiz.
+# Erişim kontrolü (host_reachable) her zaman asıl ölçüttür.
+#
+# ⚠️ EN ÖNEMLİ KURAL: VPN algılanması proxy'lerin AÇILMASINA yol açmaz.
+#    Tüneller yalnızca kullanıcı açıkça isteyip `start`/menü 1 dediğinde
+#    açılır. Bkz. AUTO_OPEN_KURALI.
 # -----------------------------------------------
 SNAP=""
 refresh_snapshot() {
@@ -136,43 +153,69 @@ refresh_snapshot() {
     /inet / && i ~ /^utun/ { print i, $2 }
   ')
 }
-# tailscale: 100.64.0.0/10 beklenir; openvpn: 100.x HARİÇ adres
-vpn_tunnel_ip() {
-  local mode="${1:-openvpn}" iface ip
+
+# VPN süreç imzaları. Yeni bir VPN istemcisi çıkarsa buraya eklemek yeterli;
+# görünen isim de otomatik çıkarılır.
+VPN_PROC_RE='openvpn|openvpn3|wireguard|wg-quick|tailscaled|nordvpn|nordlynx|expressvpn|protonvpn|cyberghost|mullvad|windscribe|surfshark|anyconnect|cisco|forticlient|vpnclient|openvpnaccess'
+
+# Bir komut satırından okunabilir VPN adı türet.
+# .app içinden çalışanlarda (Tunnelblick) uygulama adını döndürür,
+# yoksa çalıştırılabilir dosyanın adını.
+vpn_name_from_cmd() {
+  local cmd="${1:-}" app bin
+  app=$(printf '%s' "$cmd" | sed -nE 's#.*(/[^/ ]*\.app)/.*#\1#p' | head -1)
+  if [ -n "$app" ]; then printf '%s' "${app##*/}" | sed 's/\.app$//'; return 0; fi
+  bin=$(printf '%s' "$cmd" | awk '{print $1}')
+  bin="${bin##*/}"
+  printf '%s' "${bin%.app}"
+}
+
+# 1) macOS sistem VPN servislerinden BAĞLI olanın adı.
+vpn_system_service() {
+  local line name
+  line=$(scutil --nc list 2>/dev/null | awk '
+    /\(Connected\)/ && /\[VPN/ { print; exit }
+  ')
+  [ -n "$line" ] || return 1
+  name=$(printf '%s' "$line" | sed -nE 's/.*\("([^"]*)"\).*/\1/p')
+  [ -n "$name" ] || name="VPN"
+  printf '%s' "$name"
+}
+
+# 2) Çalışan VPN süreçlerinin adları (+ ile ayrılmış, tek satır).
+vpn_process_names() {
+  local pid cmd name acc=""
+  for pid in $(pgrep -f "$VPN_PROC_RE" 2>/dev/null); do
+    [ "$pid" = "$$" ] && continue
+    cmd=$(ps -p "$pid" -o command= 2>/dev/null) || continue
+    case "$cmd" in *vpn_proxy.sh*) continue ;; esac
+    name=$(vpn_name_from_cmd "$cmd")
+    [ -n "$name" ] || continue
+    case "+$acc+" in *"+${name}+"*) continue ;; esac
+    acc="$acc${acc:++}$name"
+  done
+  [ -n "$acc" ] || return 1
+  printf '%s' "$acc"
+}
+
+# 3) Yedek sinyal: gerçek IP'si olan etkin utun arayüzü.
+vpn_active_iface() {
+  local iface ip
   while read -r iface ip; do
     [ -z "$ip" ] && continue
-    if [ "$mode" = "tailscale" ]; then
-      case "$ip" in 100.*) echo "$iface $ip"; return 0 ;; esac
-    else
-      case "$ip" in 100.*) ;; *) echo "$iface $ip"; return 0 ;; esac
-    fi
+    case "$ip" in 127.*|169.254.*) continue ;; esac
+    printf '%s' "$iface"; return 0
   done <<< "$SNAP"
   return 1
 }
-is_tunnelblick() {
-  pgrep -x openvpn >/dev/null 2>&1 || return 1
-  vpn_tunnel_ip openvpn >/dev/null 2>&1
-}
-is_tailscale() {
-  scutil --nc status Tailscale 2>/dev/null | grep -qx Connected || return 1
-  vpn_tunnel_ip tailscale >/dev/null 2>&1
-}
-is_forti() {
-  scutil --nc status VPN 2>/dev/null | grep -qx Connected || return 1
-  vpn_tunnel_ip openvpn >/dev/null 2>&1
-}
-is_blanc() {
-  scutil --nc status BlancVPN 2>/dev/null | grep -qx Connected || return 1
-  vpn_tunnel_ip openvpn >/dev/null 2>&1
-}
 
+# VPN'nin adını döndürür; kapalıysa "kapalı".
 vpn_state() {
-  local s="kapalı"
-  is_tunnelblick && s="Tunnelblick"
-  is_tailscale  && s="$s+Tailscale"
-  is_forti      && s="$s+FortiClient"
-  is_blanc      && s="$s+BlancVPN"
-  printf '%s' "$s"
+  local n
+  if n=$(vpn_system_service); then printf '%s' "$n"; return 0; fi
+  if n=$(vpn_process_names); then printf '%s' "$n"; return 0; fi
+  if n=$(vpn_active_iface); then printf 'VPN (%s)' "$n"; return 0; fi
+  printf 'kapalı'
 }
 vpn_up() {
   # SNAP bayatlamış olabilir (script uzun süre açık kalmışsa); tazele.
@@ -181,8 +224,20 @@ vpn_up() {
 }
 # VPN arayüzü açık OLMAK ZORUNDA; hedef makineye erişim de ayrıca doğrulanır.
 host_reachable() { nc -z -G 3 "$PROXY_HOST" "$PROXY_SSH_PORT" >/dev/null 2>&1; }
+
+# ⚠️ AUTO_OPEN_KURALI — EN ÖNEMLİ KURAL ⚠️
+#
+# VPN açıldı diye proxy'ler KENDİLİĞİNDEN açılmaz. Tüneller yalnızca:
+#   • `./vpn_proxy.sh start` / menüden 1 / `./vpn_proxy.sh <no>` ile
+#     kullanıcı AÇIKÇA istediğinde,
+#   • kullanıcı zaten daemon'u çalıştırıyorsa, VPN gidip geldiğinde
+#     (çünkü o zaman kullanıcı açıkça açmak istemiştir)
+# kurulur.
+#
+# VPN algılanması tek başına HİÇBİR zaman tünel açmaz.
 can_connect() { vpn_up && host_reachable; }
 
+# -----------------------------------------------
 # -----------------------------------------------
 # Caffeinate — VPN bağlıyken uykuya girmeyi engeller
 # -----------------------------------------------
@@ -745,31 +800,37 @@ stop_all() {
 stream_log() {
   [ -f "$LOG_FILE" ] || { say "Log yok: $LOG_FILE"; return 1; }
   say "── canlı log ──"
-  say "   Menüye dönmek için: 'q' + Enter"
+  say "   Menüye dönmek için: 'q'"
   say "────────────────────────────────────────────────────────"
-  # Önceki satırları bir kez bas
+  # Son 30 satırı bir kez bas.
+  local offset total line key
   tail -n 30 "$LOG_FILE" 2>/dev/null | while IFS= read -r line; do colorize_log "$line"; done
-  # Canlı takip: 'q' girilene kadar log satırlarını bas.
-  # tail -f'in stdin'i var; onu kullanıcı kanalı yapıp 'q'yu yakalarız.
-  tail -f -n 0 "$LOG_FILE" 2>/dev/null | while IFS= read -r line; do
-    colorize_log "$line"
-    # 'q' basıldıysa menüye dön
-    if read -t 0.3 -r k 2>/dev/null; then
-      case "$k" in q|Q) break ;; esac
-    fi
-  done &
-  local logpid=$!
-  # Kullanıcıdan 'q' bekle (read bu satırı bekler)
+  offset=$(wc -l < "$LOG_FILE" 2>/dev/null | tr -d ' ')
+  [ -n "$offset" ] || offset=0
+  # Tek döngü: hem logu izle hem klavye dinle.
+  # ÖNEMLİ: stdin'i TEK yer okur. Arka planda ikinci bir `read` olursa
+  # klavye girdisi yarışla paylaşılır ve 'q' kaybolurdu.
   while true; do
-    read -r -n 1 -t 1 key 2>/dev/null || continue
-    case "$key" in
-      q|Q) break ;;
-    esac
+    total=$(wc -l < "$LOG_FILE" 2>/dev/null | tr -d ' ')
+    [ -n "$total" ] || total=0
+    if [ "$total" -gt "$offset" ]; then
+      sed -n "$((offset + 1)),${total}p" "$LOG_FILE" 2>/dev/null \
+        | while IFS= read -r line; do colorize_log "$line"; done
+      offset=$total
+    fi
+    # 1s bekle, bu arada 'q' geldi mi diye bak.
+    # DİKKAT: macOS bash 3.2'de `read -t` sadece TAM SAYI kabul eder.
+    # Kesirli değer ("0.3") "invalid timeout specification" verir ve
+    # döngü hiç okumadan sonsuza kadar döner — script'i kilitler.
+    if read -r -n 1 -t 1 key 2>/dev/null; then
+      case "$key" in
+        q|Q) break ;;
+      esac
+    fi
   done
-  kill "$logpid" 2>/dev/null
-  pkill -P "$logpid" 2>/dev/null
   say ""
   say "── menüye dönüldü ──"
+  return 0
 }
 
 # Log satırını renklendir
